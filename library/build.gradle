@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc2"
+    buildToolsVersion '22.0.1'
 
     defaultConfig {
         minSdkVersion 21
@@ -18,8 +18,35 @@ android {
     }
 }
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'stopwatch-view'
+
+    publishedGroupId = 'de.pulbert.library'
+    libraryName = 'Stopwatch-View'
+    artifact = 'stopwatch-view'
+
+    libraryDescription = 'A StopwatchView with a Service and a Notification. With the Notification you can pause, resume and stop the Time outside of the Application.'
+
+    siteUrl = 'https://github.com/pimato/StopwatchView'
+    gitUrl = 'https://github.com/pimato/StopwatchView.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'pimato'
+    developerName = 'Thomas Pulber'
+    developerEmail = 'ThomasPulber91@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+
+
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-
 }
