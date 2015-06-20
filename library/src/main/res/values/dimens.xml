@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- stopwatch -->
+    <dimen name="circletimer_dot_size">12dip</dimen>
+    <dimen name="circletimer_circle_size">4dip</dimen>
+    <dimen name="circletimer_marker_size">16dip</dimen>
+    <dimen name="small_font_size">17sp</dimen>
+    <dimen name="label_text_size">14sp</dimen>
+
+    <!-- The width and height of the notification icon -->
+    <dimen name="notification_icon_size">64dip</dimen>
+    <!-- Size of notification text (see TextAppearance.StatusBar.EventContent) -->
+    <dimen name="notification_text_size">14dp</dimen>
+    <!-- Size of notification text titles (see TextAppearance.StatusBar.EventContent.Title) -->
+    <dimen name="notification_title_text_size">18dp</dimen>
+
+    <dimen name="fab_compat_margin">0dp</dimen>
+</resources>

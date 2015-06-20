@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pulbert.stopwatchview" >
 
+    <!-- Stopwatch -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,6 +19,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="pulbert.library.StopwatchService"
+            android:exported="false"
+            android:description="@string/stopwatch_service_desc">
+            <intent-filter>
+                <action android:name="start_stopwatch" />
+                <action android:name="lap_stopwatch" />
+                <action android:name="stop_stopwatch" />
+                <action android:name="reset_stopwatch" />
+                <action android:name="share_stopwatch" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

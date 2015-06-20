@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <!-- Status Bar Styles -->
+    <style name="TextAppearance.StatusBar">
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent">
+        <item name="android:textSize">@dimen/notification_text_size</item>
+        <item name="android:textColor">@color/black_54p</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Title">
+        <item name="android:textSize">@dimen/notification_title_text_size</item>
+        <item name="android:textColor">@color/black_87p</item>
+    </style>
+    <style name="TextAppearance.StatusBar.EventContent.Title.Money">
+        <item name="android:textSize">@dimen/notification_title_text_size</item>
+        <item name="android:textColor">@color/default_money_green</item>
+    </style>
+</resources>

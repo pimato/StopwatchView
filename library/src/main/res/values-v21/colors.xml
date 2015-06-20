@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<color name="white">#ffffffff</color>
+<color name="black_87p">#de000000</color>
+<color name="black_54p">#8a000000</color>
+<color name="black_16p">#28000000</color>
+<color name="default_textview">#47474a</color>
+<color name="button_pause">#ffbb33</color>
+<color name="button_stop">#ef5350</color>
+<color name="button_start">#1492ff</color>
+<color name="button_resume">#7acd2a</color>
+<color name="default_divider_color">#ebebeb</color>
+<color name="default_money_green">#43a047</color>
+
+</resources>
