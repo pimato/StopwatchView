@@ -16,8 +16,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.text.DecimalFormat;
-
-
+import java.util.Calendar;
 
 
 public class StopwatchView extends RelativeLayout implements SharedPreferences.OnSharedPreferenceChangeListener  {
@@ -91,10 +90,13 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     public static int refcount = 0;
     public float mSalary;
+    private int mYear,mMonth,mDay;
+    private long sHour,sMinute,sSecond;
+    private long fHour,fMinute,fSecond;
+    private long bHour,bMinute,bSecond;
 
     private PrimaryButtonListener mCustomOnClickListener;
 
-    private long startTime;
 
 
     @SuppressWarnings("unused")
@@ -124,9 +126,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         this.mSalary = mSalary;
     }
 
-    public float getSalary() {
-        return mSalary;
-    }
 
     public void init(){
         refcount++;
@@ -236,8 +235,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 mShapeV.setColor(mResumeColor);
                 mButtonStop.setText(getContext().getResources().getString(R.string.stopwatch_resume));
                 //save actual Color
-                startTime = Utils.getTimeNow();
-                mAccumulatedTime += (startTime - mStartTime);
+                long curTime = Utils.getTimeNow();
+                mAccumulatedTime += (curTime - mStartTime);
                 doStop();
                 intent.setAction(StopwatchView.STOP_STOPWATCH);
                 context.startService(intent);
@@ -268,6 +267,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
             case StopwatchView.STOPWATCH_RESET:
                 // do start
                 doStart(time);
+                saveStartTime();
                 intent.setAction(StopwatchView.START_STOPWATCH);
                 context.startService(intent);
                 acquireWakeLock();
@@ -282,6 +282,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
             default:
                 doResetAndStop();
                 setViewsVisible(false);
+                saveFinishTime();
                 mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
                 mShapeV.setColor(mButtonPauseColor);
                 mButtonStop.setText(getContext().getResources().getString(R.string.stopwatch_pause));
@@ -297,6 +298,23 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         }
 
 
+    }
+
+    public void saveStartTime(){
+        Calendar c = Calendar.getInstance();
+        sHour = c.get(Calendar.HOUR_OF_DAY);
+        sMinute = c.get(Calendar.MINUTE);
+        sSecond = c.get(Calendar.SECOND);
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public void saveFinishTime(){
+        Calendar c = Calendar.getInstance();
+        fHour = c.get(Calendar.HOUR_OF_DAY);
+        fMinute = c.get(Calendar.MINUTE);
+        fSecond = c.get(Calendar.SECOND);
     }
 
     private void setViewsVisible(boolean visible){
@@ -494,6 +512,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         if (hours > 999) {
             hours = 0;
         }
+        bSecond = seconds;
+        bMinute = minutes;
+        bHour = hours;
 
         float hourInSeconds = (hours * 60)*60;
         float minutesInSeconds = (minutes * 60);
@@ -659,9 +680,30 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         editor.apply();
     }
 
+    public long getYear() { return mYear; }
+    public long getMonth() { return mMonth; }
+    public long getDay() { return mDay; }
 
-    public long getStartTime() {
-        return startTime;
+
+    public long getStartHour() {
+        return sHour;
     }
+    public long getStartMinute() { return sMinute; }
+    public long getStartSecond() {
+        return sSecond;
+    }
+
+    public long getFinishHour() { return fHour; }
+    public long getFinishMinute() { return fMinute; }
+    public long getFinishSecond() {
+        return fSecond;
+    }
+
+    public long getBetweenHour() { return bHour; }
+    public long getBetweenMinute() { return bMinute; }
+    public long getBetweenSecond() {
+        return bSecond;
+    }
+
 }
 
