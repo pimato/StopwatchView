@@ -91,9 +91,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static int refcount = 0;
     public float mSalary;
     private int mYear,mMonth,mDay;
-    private long sHour,sMinute,sSecond;
-    private long fHour,fMinute,fSecond;
-    private long bHour,bMinute,bSecond;
+    private int sHour,sMinute,sSecond;
+    private int fHour,fMinute,fSecond;
+    private int bHour,bMinute,bSecond;
 
     private PrimaryButtonListener mCustomOnClickListener;
 
@@ -266,8 +266,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         switch (mState){
             case StopwatchView.STOPWATCH_RESET:
                 // do start
-                doStart(time);
                 saveStartTime();
+                doStart(time);
                 intent.setAction(StopwatchView.START_STOPWATCH);
                 context.startService(intent);
                 acquireWakeLock();
@@ -427,6 +427,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         Utils.clearSwSharedPref(prefs);
         clearSharedPref(prefs, "sw");
+
         mAccumulatedTime = 0;
         mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
         mState = StopwatchView.STOPWATCH_RESET;
@@ -458,6 +459,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         public void run() {
             long curTime = Utils.getTimeNow();
             long totalTime = mAccumulatedTime + (curTime - mStartTime);
+            initBetweenTime(totalTime);
             updateTextViews(totalTime, false, true);
 
             StopwatchView.this.postDelayed(mTimeUpdateThread, STOPWATCH_REFRESH_INTERVAL_MILLIS);
@@ -512,9 +514,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         if (hours > 999) {
             hours = 0;
         }
-        bSecond = seconds;
-        bMinute = minutes;
-        bHour = hours;
 
         float hourInSeconds = (hours * 60)*60;
         float minutesInSeconds = (minutes * 60);
@@ -590,6 +589,22 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         mTimerCounter.setText(getTimeString());
         mSalaryCounter.setText(mCompleteSalary);
 
+    }
+
+    public void initBetweenTime(long time){
+        long hundreds, seconds, minutes, hours;
+        seconds = time / 1000;
+        hundreds = (time - seconds * 1000) / 10;
+        minutes = seconds / 60;
+        seconds = seconds - minutes * 60;
+        hours = minutes / 60;
+        minutes = minutes - hours * 60;
+        if (hours > 999) {
+            hours = 0;
+        }
+        bSecond =(int) seconds;
+        bMinute =(int) minutes;
+        bHour =(int) hours;
     }
 
     public String getTimeString() {
@@ -680,28 +695,28 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         editor.apply();
     }
 
-    public long getYear() { return mYear; }
-    public long getMonth() { return mMonth; }
+    public int getYear() { return mYear; }
+    public int getMonth() { return mMonth; }
     public long getDay() { return mDay; }
 
 
-    public long getStartHour() {
+    public int getStartHour() {
         return sHour;
     }
-    public long getStartMinute() { return sMinute; }
-    public long getStartSecond() {
+    public int getStartMinute() { return sMinute; }
+    public int getStartSecond() {
         return sSecond;
     }
 
-    public long getFinishHour() { return fHour; }
-    public long getFinishMinute() { return fMinute; }
-    public long getFinishSecond() {
+    public int getFinishHour() { return fHour; }
+    public int getFinishMinute() { return fMinute; }
+    public int getFinishSecond() {
         return fSecond;
     }
 
-    public long getBetweenHour() { return bHour; }
-    public long getBetweenMinute() { return bMinute; }
-    public long getBetweenSecond() {
+    public int getBetweenHour() { return bHour; }
+    public int getBetweenMinute() { return bMinute; }
+    public int getBetweenSecond() {
         return bSecond;
     }
 

@@ -1,8 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="app_name">stopwatch</string>
-
-
     <!-- Stopwatch accessibility strings -->
     <plurals name="Nhours_description">
         <!-- 1 hour -->
