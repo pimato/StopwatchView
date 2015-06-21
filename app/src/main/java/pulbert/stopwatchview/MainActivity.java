@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import pulbert.library.StopwatchService;
 import pulbert.library.StopwatchView;
@@ -22,6 +24,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mStopwatch =(StopwatchView) findViewById(R.id.stopwatch_view);
+        mStopwatch.setPrimaryButtonListener(new StopwatchView.PrimaryButtonListener() {
+            @Override
+            public void onClick(View v, boolean checked) {
+                if (checked) {
+                    Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "stop", Toast.LENGTH_SHORT).show();
+                }
+
+        }
+    });
         mStopwatch.setSalary(32.0f);
 
     }

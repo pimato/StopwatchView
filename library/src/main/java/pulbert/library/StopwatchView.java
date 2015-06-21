@@ -92,6 +92,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static int refcount = 0;
     public float mSalary;
 
+    private PrimaryButtonListener mCustomOnClickListener;
+
+
     @SuppressWarnings("unused")
     public StopwatchView(Context context) {
         this(context, null);
@@ -105,6 +108,14 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         super(context, attrs, defStyle,0);
         mSalary = 15.0f;
         init();
+    }
+
+    public interface PrimaryButtonListener {
+        void onClick(View v, boolean checked);
+    }
+
+    public void setPrimaryButtonListener(PrimaryButtonListener mCustomOnClickListener) {
+        this.mCustomOnClickListener = mCustomOnClickListener;
     }
 
     public void setSalary(float mSalary) {
@@ -146,7 +157,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         mButtonStopWatch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonMainPressed();
+                buttonMainPressed(v);
             }
         });
         mButtonStop.setOnClickListener(new OnClickListener() {
@@ -244,7 +255,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         }
     }
 
-    public void buttonMainPressed(){
+    public void buttonMainPressed(View v){
         long time = Utils.getTimeNow();
         Context context = getContext().getApplicationContext();
         Intent intent = new Intent(context, StopwatchService.class);
@@ -261,6 +272,10 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 mButtonStopWatch.setText(context.getResources().getString(R.string.stopwatch_stop));
                 mShape.setColor(mButtonStopColor);
                 setViewsVisible(true);
+                if(mCustomOnClickListener != null) {
+                    mCustomOnClickListener.onClick(v,true);
+                }
+                // Invoke the other added onclick listener
                 break;
             default:
                 doResetAndStop();
@@ -270,11 +285,16 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 mButtonStop.setText(getContext().getResources().getString(R.string.stopwatch_pause));
                 mButtonStopWatch.setText(context.getResources().getString(R.string.stopwatch_start));
                 mShape.setColor(mButtonStartColor);
+                if(mCustomOnClickListener != null) {
+                    mCustomOnClickListener.onClick(v,false);
+                }
                 releaseWakeLock();
                 break;
 
 
         }
+
+
     }
 
     private void setViewsVisible(boolean visible){
