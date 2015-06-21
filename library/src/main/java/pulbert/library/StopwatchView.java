@@ -94,6 +94,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     private PrimaryButtonListener mCustomOnClickListener;
 
+    private long startTime;
+
 
     @SuppressWarnings("unused")
     public StopwatchView(Context context) {
@@ -234,8 +236,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 mShapeV.setColor(mResumeColor);
                 mButtonStop.setText(getContext().getResources().getString(R.string.stopwatch_resume));
                 //save actual Color
-                long curTime = Utils.getTimeNow();
-                mAccumulatedTime += (curTime - mStartTime);
+                startTime = Utils.getTimeNow();
+                mAccumulatedTime += (startTime - mStartTime);
                 doStop();
                 intent.setAction(StopwatchView.STOP_STOPWATCH);
                 context.startService(intent);
@@ -655,6 +657,11 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         editor.remove (key + PREF_CTV_MARKER_TIME);
         editor.remove (key + PREF_CTV_TIMER_MODE);
         editor.apply();
+    }
+
+
+    public long getStartTime() {
+        return startTime;
     }
 }
 
