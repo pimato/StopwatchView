@@ -47,20 +47,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     private PowerManager.WakeLock mWakeLock;
     private View divider;
 
-    private long mIntervalTime = 0;
-    private long mIntervalStartTime = -1;
-    private long mMarkerTime = -1;
-    private long mCurrentIntervalTime = 0;
-    private long mAccumulatedTimeP = 0;
-    private boolean mPaused = false;
-
-    public static final String PREF_CTV_PAUSED  = "_ctv_paused";
-    public static final String PREF_CTV_INTERVAL  = "_ctv_interval";
-    public static final String PREF_CTV_INTERVAL_START = "_ctv_interval_start";
-    public static final String PREF_CTV_CURRENT_INTERVAL = "_ctv_current_interval";
-    public static final String PREF_CTV_ACCUM_TIME = "_ctv_accum_time";
-    public static final String PREF_CTV_TIMER_MODE = "_ctv_timer_mode";
-    public static final String PREF_CTV_MARKER_TIME = "_ctv_marker_time";
 
     public static final String START_STOPWATCH = "start_stopwatch";
     public static final String LAP_STOPWATCH = "lap_stopwatch";
@@ -73,6 +59,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static final String KILL_NOTIF = "kill_notification";
     public static final String PREF_START_TIME  = "sw_start_time";
     public static final String PREF_ACCUM_TIME = "sw_accum_time";
+
+    //save year
+    public static final String PREF_YEAR ="sw_start_year";
     public static final String PREF_STATE = "sw_state";
     public static final String PREF_LAP_NUM = "sw_lap_num";
     public static final String PREF_LAP_TIME = "sw_lap_time_";
@@ -89,7 +78,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static final int MAX_LAPS = 99;
 
     public static int refcount = 0;
-    public float mSalary;
+    public float mWage;
     private int mYear,mMonth,mDay;
     private int sHour,sMinute,sSecond;
     private int fHour,fMinute,fSecond;
@@ -110,7 +99,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     }
     public StopwatchView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle,0);
-        mSalary = 15.0f;
+        mWage = 15.0f;
         init();
     }
 
@@ -122,8 +111,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         this.mCustomOnClickListener = mCustomOnClickListener;
     }
 
-    public void setSalary(float mSalary) {
-        this.mSalary = mSalary;
+    public void setWage(float mWage) {
+        this.mWage = mWage;
     }
 
 
@@ -306,6 +295,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         sMinute = c.get(Calendar.MINUTE);
         sSecond = c.get(Calendar.SECOND);
         mYear = c.get(Calendar.YEAR);
+        Log.e("Library","saveStartTime YEAR : "+ mYear);
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
     }
@@ -348,7 +338,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong (StopwatchView.PREF_START_TIME, mStartTime);
         editor.putLong (StopwatchView.PREF_ACCUM_TIME, mAccumulatedTime);
-        editor.putInt (StopwatchView.PREF_STATE, mState);
+        editor.putInt(StopwatchView.PREF_YEAR,mYear);
+        Log.e("libary", "writeToSharedPref: "+mYear);
+        editor.putInt(StopwatchView.PREF_STATE, mState);
 
         if (mState == StopwatchView.STOPWATCH_RUNNING) {
             editor.putLong(StopwatchView.NOTIF_CLOCK_BASE, mStartTime-mAccumulatedTime);
@@ -370,6 +362,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public void readFromSharedPref(SharedPreferences prefs) {
         mStartTime = prefs.getLong(StopwatchView.PREF_START_TIME, 0);
         mAccumulatedTime = prefs.getLong(StopwatchView.PREF_ACCUM_TIME, 0);
+        mYear = prefs.getInt(StopwatchView.PREF_YEAR, 0);
+        Log.e("Library","YEAR :"+ mYear);
         mState = prefs.getInt(StopwatchView.PREF_STATE, StopwatchView.STOPWATCH_RESET);
 
         //     if (prefs.getBoolean(StopwatchView.PREF_UPDATE_CIRCLE, true)) {
@@ -518,9 +512,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         float hourInSeconds = (hours * 60)*60;
         float minutesInSeconds = (minutes * 60);
         float allSeconds = hourInSeconds + minutesInSeconds +seconds;
-        float salaryPerMinute = mSalary /60;
-        float salaryPerSeconds = salaryPerMinute /60;
-        float mSalary = allSeconds * salaryPerSeconds;
+        float wagePerMinute = mWage /60;
+        float wagePerSeconds = wagePerMinute /60;
+        float mSalary = allSeconds * wagePerSeconds;
 
         //save complete Salary in String
         mCompleteSalary = new DecimalFormat("0.00").format(mSalary);
@@ -659,6 +653,21 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     }
 
 
+    private long mIntervalTime = 0;
+    private long mIntervalStartTime = -1;
+    private long mMarkerTime = -1;
+    private long mCurrentIntervalTime = 0;
+    private long mAccumulatedTimeP = 0;
+    private boolean mPaused = false;
+
+    public static final String PREF_CTV_PAUSED  = "_ctv_paused";
+    public static final String PREF_CTV_INTERVAL  = "_ctv_interval";
+    public static final String PREF_CTV_INTERVAL_START = "_ctv_interval_start";
+    public static final String PREF_CTV_CURRENT_INTERVAL = "_ctv_current_interval";
+    public static final String PREF_CTV_ACCUM_TIME = "_ctv_accum_time";
+    public static final String PREF_CTV_TIMER_MODE = "_ctv_timer_mode";
+    public static final String PREF_CTV_MARKER_TIME = "_ctv_marker_time";
+
     // Since this view is used in multiple places, use the key to save different instances
     public void writeToSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();
@@ -682,6 +691,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     public void clearSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(StopwatchView.PREF_YEAR);
         editor.remove (StopwatchView.PREF_START_TIME);
         editor.remove (StopwatchView.PREF_ACCUM_TIME);
         editor.remove (StopwatchView.PREF_STATE);

@@ -1,20 +1,14 @@
 package pulbert.stopwatchview;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 
@@ -35,16 +29,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v, boolean checked) {
                 if (checked) {
-                    Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
                     toastStart();
                 } else {
-                    Toast.makeText(MainActivity.this, "stop", Toast.LENGTH_SHORT).show();
                     toastEnd();
                 }
 
         }
     });
-        mStopwatch.setSalary(32.0f);
+        mStopwatch.setWage(32.0f);
 
     }
 
