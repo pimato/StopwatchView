@@ -1,16 +1,15 @@
 package pulbert.stopwatchview;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
-import net.danlew.android.joda.JodaTimeAndroid;
-
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
 
 import pulbert.library.StopwatchService;
 import pulbert.library.StopwatchView;
@@ -23,31 +22,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        JodaTimeAndroid.init(this);
+
         mStopwatch =(StopwatchView) findViewById(R.id.stopwatch_view);
         mStopwatch.setPrimaryButtonListener(new StopwatchView.PrimaryButtonListener() {
             @Override
             public void onClick(View v, boolean checked) {
                 if (checked) {
-                    toastStart();
+                    Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
                 } else {
-                    toastEnd();
+                    Toast.makeText(MainActivity.this, "stop", Toast.LENGTH_SHORT).show();
                 }
 
         }
     });
-        mStopwatch.setWage(32.0f);
+        mStopwatch.setSalary(32.0f);
 
     }
 
-    public void toastStart(){
-        Toast.makeText(this,"start",Toast.LENGTH_SHORT).show();
-    }
-    public void toastEnd(){
-        Toast.makeText(this,"Time"+mStopwatch.getSeconds(), Toast.LENGTH_SHORT).show();
-
-      //  Toast.makeText(this,"Jahr :"+mStopwatch.getYear()+"Monat :"+mStopwatch.getMonth()+"Tag :"+mStopwatch.getDay(),Toast.LENGTH_SHORT).show();
-    }
 
 
     @Override

@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0.8"
+        versionName "1.0.2"
     }
     buildTypes {
         release {
@@ -31,7 +31,7 @@ ext {
     siteUrl = 'https://github.com/pimato/StopwatchView'
     gitUrl = 'https://github.com/pimato/StopwatchView.git'
 
-    libraryVersion = '0.0.8'
+    libraryVersion = '0.0.2'
 
     developerId = 'pimato'
     developerName = 'Thomas Pulber'
