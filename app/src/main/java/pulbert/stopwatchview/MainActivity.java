@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         mStopwatch.setSecondaryButtonListener(new StopwatchView.ButtonListener() {
             @Override
             public void onClick(View v, boolean checked) {
-                Toast.makeText(MainActivity.this,"pause",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,mStopwatch.getDateString(),Toast.LENGTH_SHORT).show();
             }
         });
         mStopwatch.setPrimaryButtonListener(new StopwatchView.ButtonListener() {
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 if (checked) {
                     Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "stop", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,mStopwatch.getDateString(),Toast.LENGTH_SHORT).show();
                 }
 
         }
