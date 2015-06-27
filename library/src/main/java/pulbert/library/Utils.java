@@ -21,12 +21,6 @@ public class Utils {
         editor.remove (StopwatchView.PREF_START_TIME);
         editor.remove (StopwatchView.PREF_ACCUM_TIME);
         editor.remove (StopwatchView.PREF_STATE);
-        int lapNum = prefs.getInt(StopwatchView.PREF_LAP_NUM, StopwatchView.STOPWATCH_RESET);
-        for (int i = 0; i < lapNum; i++) {
-            String key = StopwatchView.PREF_LAP_TIME + Integer.toString(i);
-            editor.remove(key);
-        }
-        editor.remove(StopwatchView.PREF_LAP_NUM);
         editor.apply();
     }
 }

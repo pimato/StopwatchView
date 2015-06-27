@@ -41,26 +41,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toastStart(){
-        Toast.makeText(this,mStopwatch.getStartHour() + ":"+ mStopwatch.getStartMinute(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"start",Toast.LENGTH_SHORT).show();
     }
     public void toastEnd(){
-        Toast.makeText(this,mStopwatch.getStartHour() + ":"+ mStopwatch.getStartMinute(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Time"+mStopwatch.getSeconds(), Toast.LENGTH_SHORT).show();
+
+      //  Toast.makeText(this,"Jahr :"+mStopwatch.getYear()+"Monat :"+mStopwatch.getMonth()+"Tag :"+mStopwatch.getDay(),Toast.LENGTH_SHORT).show();
     }
-
-    public String getFullHourString(){
-
-        DateTime testStart = new DateTime().withDayOfMonth(1).withTime((int)mStopwatch.getStartHour(),(int) mStopwatch.getStartMinute(), 0, 0);
-        DateTime testEnd = new DateTime().withDayOfMonth(2).withTime((int)mStopwatch.getFinishHour(), (int) mStopwatch.getFinishMinute(), 0, 0);
-        Period test = new Period(testStart , testEnd);
-        int h = test.getHours();
-        int m = test.getMinutes();
-        String f = String.format("%%0%dd", 2);
-        String temp =DateTimeFormat.forPattern("HH:mm").print(testStart)+ " - "+
-                DateTimeFormat.forPattern("HH:mm").print(testEnd)+ " | "+
-                Long.toString(h)+":"+String.format(f, m);
-        return temp;
-    }
-
 
 
     @Override
