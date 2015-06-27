@@ -352,32 +352,6 @@ public class StopwatchService extends Service {
         }
     }
 
-    private void writeSharedPrefsLap(long lapTimeElapsed, boolean updateCircle) {
-        writeToSharedPrefs(null, lapTimeElapsed, null, null, updateCircle);
-        if (updateCircle) {
-            long time = Utils.getTimeNow();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                    getApplicationContext());
-            SharedPreferences.Editor editor = prefs.edit();
-            long laps[] = readLapsFromPrefs();
-            int numLaps = laps.length;
-            long lapTime = laps[1];
-            if (numLaps == 2) { // Have only hit lap once.
-                editor.putLong(StopwatchView.KEY + StopwatchView.PREF_CTV_INTERVAL, lapTime);
-            } else {
-                editor.putLong(StopwatchView.KEY + StopwatchView.PREF_CTV_MARKER_TIME, lapTime);
-            }
-            editor.putLong(StopwatchView.KEY + StopwatchView.PREF_CTV_ACCUM_TIME, 0);
-            if (numLaps < StopwatchView.MAX_LAPS) {
-                editor.putLong(StopwatchView.KEY + StopwatchView.PREF_CTV_INTERVAL_START, time);
-                editor.putBoolean(StopwatchView.KEY + StopwatchView.PREF_CTV_PAUSED, false);
-            } else {
-                editor.putLong(StopwatchView.KEY + StopwatchView.PREF_CTV_INTERVAL_START, -1);
-            }
-            editor.apply();
-        }
-    }
-
     private void writeSharedPrefsStopped(long elapsedTime, boolean updateCircle) {
         writeToSharedPrefs(null, null, elapsedTime, StopwatchView.STOPWATCH_STOPPED, updateCircle);
         if (updateCircle) {
