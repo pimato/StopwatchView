@@ -1,13 +1,8 @@
 package pulbert.stopwatchview;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,7 +19,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mStopwatch =(StopwatchView) findViewById(R.id.stopwatch_view);
-        mStopwatch.setPrimaryButtonListener(new StopwatchView.PrimaryButtonListener() {
+        mStopwatch.setSecondaryButtonListener(new StopwatchView.ButtonListener() {
+            @Override
+            public void onClick(View v, boolean checked) {
+                Toast.makeText(MainActivity.this,"pause",Toast.LENGTH_SHORT).show();
+            }
+        });
+        mStopwatch.setPrimaryButtonListener(new StopwatchView.ButtonListener() {
             @Override
             public void onClick(View v, boolean checked) {
                 if (checked) {
