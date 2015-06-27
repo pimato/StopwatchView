@@ -12,13 +12,13 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.util.Calendar;
 
 public class StopwatchService extends Service {
     // Member fields
     private long mElapsedTime;
     private long mStartTime;
     private int mYear,mMonth,mDay;
+    private int sMinute,sHour;
     private boolean mLoadApp;
     private NotificationManager mNotificationManager;
 
@@ -34,6 +34,8 @@ public class StopwatchService extends Service {
 
     @Override
     public void onCreate() {
+        sHour = 0;
+        sMinute = 0;
         mYear = 0;
         mMonth = 0;
         mDay = 0;
@@ -58,7 +60,7 @@ public class StopwatchService extends Service {
         boolean updateCircle = showNotif; // Don't save updates to the cirle if we're in the app.
         if (actionType.equals(StopwatchView.START_STOPWATCH)) {
             mStartTime = actionTime;
-            writeSharedPrefsStarted(mYear,mMonth,mDay,mStartTime, updateCircle);
+            writeSharedPrefsStarted(mYear,mMonth,mDay,sHour,sMinute,mStartTime, updateCircle);
             if (showNotif) {
                 setNotification(mStartTime - mElapsedTime, true);
             } else {
@@ -67,7 +69,7 @@ public class StopwatchService extends Service {
         }
         else if (actionType.equals(StopwatchView.STOP_STOPWATCH)) {
             mElapsedTime = mElapsedTime + (actionTime - mStartTime);
-            writeSharedPrefsStopped(mYear,mMonth,mDay,mElapsedTime, updateCircle);
+            writeSharedPrefsStopped(mYear,mMonth,mDay,sHour,sMinute,mElapsedTime, updateCircle);
             if (showNotif) {
                 setNotification(actionTime - mElapsedTime, false);
             } else {
@@ -107,6 +109,8 @@ public class StopwatchService extends Service {
     public void onDestroy() {
         mNotificationManager.cancel(NOTIFICATION_ID);
         clearSavedNotification();
+        sHour = 0;
+        sMinute =0;
         mYear = 0;
         mMonth = 0;
         mDay = 0;
@@ -275,9 +279,14 @@ public class StopwatchService extends Service {
         mYear = prefs.getInt(StopwatchView.PREF_YEAR,0);
         mMonth = prefs.getInt(StopwatchView.PREF_MONTH,0);
         mDay = prefs.getInt(StopwatchView.PREF_DAY,0);
+
+        sMinute = prefs.getInt(StopwatchView.PREF_START_MINUTE,0);
+        sHour = prefs.getInt(StopwatchView.PREF_START_HOUR,0);
     }
 
-    private void writeToSharedPrefs(Integer year,Integer month,Integer day,Long startTime, Long elapsedTime, Integer state, boolean updateCircle) {
+    private void writeToSharedPrefs(Integer year,Integer month,Integer day,
+                                    Integer hour,Integer minute,
+                                    Long startTime, Long elapsedTime, Integer state, boolean updateCircle) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -285,9 +294,14 @@ public class StopwatchService extends Service {
             editor.putInt(StopwatchView.PREF_YEAR, year);
             editor.putInt(StopwatchView.PREF_MONTH,month);
             editor.putInt(StopwatchView.PREF_DAY,day);
+            editor.putInt(StopwatchView.PREF_START_HOUR,hour);
+            editor.putInt(StopwatchView.PREF_START_MINUTE,minute);
+
             mYear = year;
             mMonth = month;
             mDay = day;
+            sHour = hour;
+            sMinute = minute;
 
         }
         if (startTime != null) {
@@ -311,8 +325,10 @@ public class StopwatchService extends Service {
         editor.apply();
     }
 
-    private void writeSharedPrefsStarted(Integer year,Integer month,Integer day,long startTime, boolean updateCircle) {
-        writeToSharedPrefs(year,month,day,startTime, null, StopwatchView.STOPWATCH_RUNNING, updateCircle);
+    private void writeSharedPrefsStarted(Integer year,Integer month,Integer day,
+                                         Integer hour,Integer minute,
+                                         long startTime, boolean updateCircle) {
+        writeToSharedPrefs(year,month,day,hour,minute,startTime, null, StopwatchView.STOPWATCH_RUNNING, updateCircle);
         if (updateCircle) {
             long time = Utils.getTimeNow();
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
@@ -331,8 +347,10 @@ public class StopwatchService extends Service {
     }
 
 
-    private void writeSharedPrefsStopped(Integer year,Integer month,Integer day,long elapsedTime, boolean updateCircle) {
-        writeToSharedPrefs(year,month,day,null, elapsedTime, StopwatchView.STOPWATCH_STOPPED, updateCircle);
+    private void writeSharedPrefsStopped(Integer year,Integer month,Integer day,
+                                         Integer hour,Integer minute,
+                                         long elapsedTime, boolean updateCircle) {
+        writeToSharedPrefs(year,month,day,hour,minute,null, elapsedTime, StopwatchView.STOPWATCH_STOPPED, updateCircle);
         if (updateCircle) {
             long time = Utils.getTimeNow();
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
@@ -352,7 +370,7 @@ public class StopwatchService extends Service {
     }
 
     private void writeSharedPrefsReset(boolean updateCircle) {
-        writeToSharedPrefs(null,null,null,null, null, StopwatchView.STOPWATCH_RESET, updateCircle);
+        writeToSharedPrefs(null,null,null,null,null,null, null, StopwatchView.STOPWATCH_RESET, updateCircle);
     }
 
     public static Class<?> getLauncherActivity(Context context)

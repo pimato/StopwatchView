@@ -18,7 +18,6 @@ import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 
 public class StopwatchView extends RelativeLayout implements SharedPreferences.OnSharedPreferenceChangeListener  {
@@ -91,11 +90,20 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static final String PREF_MONTH = "sw_month";
     public static final String PREF_DAY = "sw_day";
 
+    public static final String PREF_START_MINUTE = "sw_start_minute";
+    public static final String PREF_START_HOUR = "sw_start_hour";
+
+    public static final String PREF_FINISH_MINUTE = "sw_finish_minute";
+    public static final String PREF_FINISH_HOUR = "sw_finish_hour";
+
+
     private int mYear,mMonth,mDay;
+    private int sHour,sMinute;
+    private int fHour,fMinute;
 
 
     public static int refcount = 0;
-    public float mSalary;
+    public float mWage;
 
     private ButtonListener mPrimaryButtonListener,mSecondaryButtonListener;
 
@@ -109,7 +117,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     }
     public StopwatchView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle,0);
-        mSalary = 15.0f;
+        mWage = 15.0f;
         init();
     }
 
@@ -155,8 +163,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     }
 
-    public void setSalary(float mSalary) {
-        this.mSalary = mSalary;
+    public void setWage(float mSalary) {
+        this.mWage = mSalary;
     }
 
     public interface ButtonListener {
@@ -276,10 +284,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 doStart(time);
                 intent.setAction(StopwatchView.START_STOPWATCH);
                 context.startService(intent);
-                Calendar c = Calendar.getInstance();
-                mYear = c.get(Calendar.YEAR);
-                mMonth = c.get(Calendar.MONTH);
-                mDay = c.get(Calendar.DAY_OF_MONTH);
+                saveDateTimeInformation();
                 acquireWakeLock();
                 rightButton.setText(context.getResources().getString(R.string.stopwatch_stop));
                 mShape.setColor(mButtonStopColor);
@@ -290,6 +295,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
                 // Invoke the other added onclick listener
                 break;
             default:
+                saveFinishTime();
                 doResetAndStop();
                 setViewsVisible(false);
                 mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
@@ -307,6 +313,21 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         }
 
 
+    }
+
+    public void saveFinishTime(){
+        Calendar c= Calendar.getInstance();
+        fHour = c.get(Calendar.HOUR_OF_DAY);
+        fMinute = c.get(Calendar.MINUTE);
+    }
+
+    public void saveDateTimeInformation(){
+        Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+        sMinute = c.get(Calendar.MINUTE);
+        sHour = c.get(Calendar.HOUR_OF_DAY);
     }
 
 
@@ -340,6 +361,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public void writeToSharedPref(SharedPreferences prefs) {
         SharedPreferences.Editor editor = prefs.edit();
 
+        editor.putInt(StopwatchView.PREF_START_HOUR,sHour);
+        editor.putInt(StopwatchView.PREF_START_MINUTE,sMinute);
+
         editor.putInt(StopwatchView.PREF_YEAR,mYear);
         editor.putInt(StopwatchView.PREF_MONTH,mMonth);
         editor.putInt(StopwatchView.PREF_DAY,mDay);
@@ -367,7 +391,10 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     public void  readFromSharedPref(SharedPreferences prefs) {
 
-        mYear = prefs.getInt(StopwatchView.PREF_YEAR,1);
+        sHour = prefs.getInt(StopwatchView.PREF_START_HOUR,0);
+        sMinute = prefs.getInt(StopwatchView.PREF_START_MINUTE,0);
+
+        mYear = prefs.getInt(StopwatchView.PREF_YEAR,0);
         mMonth = prefs.getInt(StopwatchView.PREF_MONTH,0);
         mDay = prefs.getInt(StopwatchView.PREF_DAY,0);
 
@@ -513,7 +540,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         float hourInSeconds = (hours * 60)*60;
         float minutesInSeconds = (minutes * 60);
         float allSeconds = hourInSeconds + minutesInSeconds +seconds;
-        float salaryPerMinute = mSalary /60;
+        float salaryPerMinute = mWage /60;
         float salaryPerSeconds = salaryPerMinute /60;
         float mSalary = allSeconds * salaryPerSeconds;
 
@@ -583,7 +610,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public String getDateString(){
         Calendar c = Calendar.getInstance();
         c.set(mYear,mMonth,mDay);
-        return new SimpleDateFormat("dd.MM.yyyy").format(c.getTime());
+        return new SimpleDateFormat("dd. MMM yyyy").format(c.getTime());
     }
 
     public void initTextViews(){
@@ -657,6 +684,22 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         mAccumulatedTimeP = prefs.getLong(key + PREF_CTV_ACCUM_TIME, 0);
         mMarkerTime = prefs.getLong(key + PREF_CTV_MARKER_TIME, -1);
     }
+
+    public int getStartMinute(){
+        return sMinute;
+    }
+
+    public int getStartHour(){
+        return sHour;
+    }
+
+    public int getFinishMinute(){
+        return fMinute;
+    }
+    public int getFinishHour(){
+        return fHour;
+    }
+
 
     public void clearSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();

@@ -31,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
                 if (checked) {
                     Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this,mStopwatch.getDateString(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"GetMinute :"+mStopwatch.getFinishHour(),Toast.LENGTH_SHORT).show();
                 }
 
         }
     });
-        mStopwatch.setSalary(32.0f);
+        mStopwatch.setWage(32.0f);
 
     }
 
