@@ -45,22 +45,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Intent intent = new Intent(this, StopwatchService.class);
-        intent.setAction(StopwatchView.SHOW_NOTIF);
-        startService(intent);
-        mStopwatch.onPause();
+        mStopwatch.onPause(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // We only want to show notifications for stopwatch/timer when the app is closed so
-        // that we don't have to worry about keeping the notifications in perfect sync with
-        // the app.
-        Intent stopwatchIntent = new Intent(this, StopwatchService.class);
-        stopwatchIntent.setAction(StopwatchView.KILL_NOTIF);
-        startService(stopwatchIntent);
-        mStopwatch.onResume();
+        mStopwatch.onResume(this);
 
     }
 

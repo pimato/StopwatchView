@@ -93,8 +93,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static final String PREF_START_MINUTE = "sw_start_minute";
     public static final String PREF_START_HOUR = "sw_start_hour";
 
-    public static final String PREF_FINISH_MINUTE = "sw_finish_minute";
-    public static final String PREF_FINISH_HOUR = "sw_finish_hour";
+  //  public static final String PREF_FINISH_MINUTE = "sw_finish_minute";
+  //  public static final String PREF_FINISH_HOUR = "sw_finish_hour";
 
 
     private int mYear,mMonth,mDay;
@@ -192,7 +192,15 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         }*/
     }
 
-    public void onResume(){
+    public void onResume(Context context){
+
+        // We only want to show notifications for stopwatch/timer when the app is closed so
+        // that we don't have to worry about keeping the notifications in perfect sync with
+        // the app.
+        Intent stopwatchIntent = new Intent(context, StopwatchService.class);
+        stopwatchIntent.setAction(StopwatchView.KILL_NOTIF);
+        context.startService(stopwatchIntent);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         prefs.registerOnSharedPreferenceChangeListener(this);
         this.readFromSharedPref(prefs);
@@ -212,7 +220,12 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         }
 
     }
-    public void onPause(){
+    public void onPause(Context context){
+
+        Intent intent = new Intent(context, StopwatchService.class);
+        intent.setAction(StopwatchView.SHOW_NOTIF);
+        context.startService(intent);
+
         if (mState == StopwatchView.STOPWATCH_RUNNING) {
             this.stopUpdateThread();
 
@@ -688,11 +701,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public int getStartMinute(){
         return sMinute;
     }
-
     public int getStartHour(){
         return sHour;
     }
-
     public int getFinishMinute(){
         return fMinute;
     }
