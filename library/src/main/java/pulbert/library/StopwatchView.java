@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -124,7 +125,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public void init(){
         refcount++;
         inflate(getContext(), R.layout.stopwatch_item,this);
-        Resources r = getContext().getResources();
 
         mTimerCounter = (TextView) this.findViewById(R.id.timer_counter_textview);
         mSalaryCounter = (TextView) this.findViewById(R.id.salary_counter_textview);
@@ -137,16 +137,16 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         //get the Drawable from STOP button
         LayerDrawable mStopDrawable = (LayerDrawable) leftButton.getBackground();
         mShapeV = (GradientDrawable)  mStopDrawable.findDrawableByLayerId(R.id.button_drawable_shape);
-        mShapeV.setColor(r.getColor(R.color.button_pause));
+        mShapeV.setColor(ContextCompat.getColor(getContext(),R.color.button_pause));
 
         //get the Drawable from Start/pause button
         LayerDrawable mDrawableBG = (LayerDrawable) rightButton.getBackground();
         mShape = (GradientDrawable)  mDrawableBG.findDrawableByLayerId(R.id.button_drawable_shape);
 
-        mButtonStartColor = r.getColor(R.color.button_start);
-        mButtonStopColor = r.getColor(R.color.button_stop);
-        mButtonPauseColor = r.getColor(R.color.button_pause);
-        mResumeColor = r.getColor(R.color.button_resume);
+        mButtonStartColor = ContextCompat.getColor(getContext(),R.color.button_start);
+        mButtonStopColor = ContextCompat.getColor(getContext(),R.color.button_stop);
+        mButtonPauseColor = ContextCompat.getColor(getContext(),R.color.button_pause);
+        mResumeColor = ContextCompat.getColor(getContext(),R.color.button_resume);
         mShape.setColor(mButtonStartColor);
         rightButton.setOnClickListener(new OnClickListener() {
             @Override
