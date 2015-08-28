@@ -1,6 +1,7 @@
 package pulbert.library;
 
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.text.DecimalFormat;
@@ -114,7 +116,8 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     private ButtonListener mSecondaryButtonListener;
     private ButtonListener mPrimaryButtonListener;
 
-    private PlayPauseView view;
+    private PlayPauseView mPlayPauseButton;
+    private ImageButton mStopButton;
 
     public StopwatchView(Context context) {
         this(context, null);
@@ -131,7 +134,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     public void init(){
         refcount++;
-        inflate(getContext(), R.layout.stopwatch_item_main,this);
+        inflate(getContext(), R.layout.stopwatch_item_main, this);
 
         mRunningLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_running_mainlayout);
         mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_idle_icon_mainlayout);
@@ -185,22 +188,27 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
       //  mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
       //      mIdleTextView.setText(mIdleText);
 
-        view = (PlayPauseView) mIdleLayout.findViewById(R.id.play_pause_view);
-        view.setOnClickListener(new View.OnClickListener() {
+        mPlayPauseButton = (PlayPauseView) mIdleLayout.findViewById(R.id.play_pause_view);
+        mStopButton = (ImageButton) mIdleLayout.findViewById(R.id.stopwatch_idle_stop_button);
+
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                view.toggle();
+                if(mPlayPauseButton.getPlayPauseDrawable().isPlay()){
+                    Log.i("StopwatchView", "is Play Button");
+                } else {
+                    Log.i("StopwatchView", "is Pause" + " Button");
+
+                }
+
+                mPlayPauseButton.toggleAnimation(mStopButton);
+
             }
         });
 
-     /*   mStartButton = (Button) mIdleLayout.findViewById(R.id.stopwatch_idle_start_button);
-        mStartButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startStopwatch();
-            }
-        });*/
+
     }
+
 
     public void startStopwatch(){
         long time = Utils.getTimeNow();
@@ -478,12 +486,12 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     /**
      * Update the time to display. Separates that time into the hours, minutes, seconds and
-     * hundredths. If update is true, the view is invalidated so that it will draw again.
+     * hundredths. If update is true, the mPlayPauseButton is invalidated so that it will draw again.
      *
      * @param time new time to display - in milliseconds
      * @param showHundredths flag to show hundredths resolution
-     * @param update to invalidate the view - otherwise the time is examined to see if it is within
-     *               100 milliseconds of zero seconds and when so, invalidate the view.
+     * @param update to invalidate the mPlayPauseButton - otherwise the time is examined to see if it is within
+     *               100 milliseconds of zero seconds and when so, invalidate the mPlayPauseButton.
      */
     // TODO:showHundredths S/B attribute or setter - i.e. unchanging over object life
     public void updateTextViews(long time, boolean showHundredths, boolean update) {
@@ -632,7 +640,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         return s.toString();
     }
 
-    // Since this view is used in multiple places, use the key to save different instances
+    // Since this mPlayPauseButton is used in multiple places, use the key to save different instances
     public void writeToSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean (key + PREF_CTV_PAUSED, mPaused);

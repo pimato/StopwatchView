@@ -18,33 +18,22 @@ import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class PlayPauseView extends FrameLayout {
 
-  /*  private static final Property<PlayPauseView, Integer> COLOR =
-            new Property<PlayPauseView, Integer>(Integer.class, "color") {
-                @Override
-                public Integer get(PlayPauseView v) {
-                    return v.getColor();
-                }
-
-                @Override
-                public void set(PlayPauseView v, Integer value) {
-                    v.setColor(value);
-                }
-            };*/
 
     private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
-
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();
-    //  private final int mPauseBackgroundColor;
-    //   private final int mPlayBackgroundColor;
-
+    private AnimatorSet collectionSet;
     private AnimatorSet mAnimatorSet;
+    private AnimatorSet stopButtonSet;
     private int mBackgroundColor;
     private int mWidth;
     private int mHeight;
+    private ObjectAnimator alphaAnimator;
 
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,19 +42,16 @@ public class PlayPauseView extends FrameLayout {
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mDrawable = new PlayPauseDrawable(context);
+        AnimatorSet set = new AnimatorSet();
+        Animator anim = mDrawable.getPausePlayAnimator();
+        set.play(anim);
+        set.start();
         mDrawable.setCallback(this);
 
-        //   mPauseBackgroundColor = getResources().getColor(R.color.purple);
-        //   mPlayBackgroundColor = getResources().getColor(R.color.blue);
     }
 
-    /*  @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.e("PlayPauseView", "onMeasure( width: "+ widthMeasureSpec +"height: "+heightMeasureSpec+")");
-        final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        setMeasuredDimension(size, size);
-    }*/
+
+
 
     @Override
     protected void onSizeChanged(final int w, final int h, int oldw, int oldh) {
@@ -87,15 +73,6 @@ public class PlayPauseView extends FrameLayout {
         }
     }
 
-    private void setColor(int color) {
-        mBackgroundColor = color;
-        invalidate();
-    }
-
-    private int getColor() {
-        return mBackgroundColor;
-    }
-
     @Override
     protected boolean verifyDrawable(Drawable who) {
         return who == mDrawable || super.verifyDrawable(who);
@@ -110,19 +87,80 @@ public class PlayPauseView extends FrameLayout {
         mDrawable.draw(canvas);
     }
 
-    public void toggle() {
+ /*   public void toggle() {
         if (mAnimatorSet != null) {
             mAnimatorSet.cancel();
         }
 
         mAnimatorSet = new AnimatorSet();
-        final boolean isPlay = mDrawable.isPlay();
-        //  final ObjectAnimator colorAnim = ObjectAnimator.ofInt(this, COLOR, isPlay ? mPauseBackgroundColor : mPlayBackgroundColor);
-        //  colorAnim.setEvaluator(new ArgbEvaluator());
         final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
         mAnimatorSet.setInterpolator(new DecelerateInterpolator());
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
         mAnimatorSet.play(pausePlayAnim);
         mAnimatorSet.start();
+    }*/
+
+
+
+    public void toggleAnimation(final ImageButton stopButton) {
+        if (collectionSet != null || mAnimatorSet != null || stopButtonSet != null) {
+            collectionSet.cancel();
+            mAnimatorSet.cancel();
+            stopButtonSet.cancel();
+        }
+
+        mAnimatorSet = new AnimatorSet();
+        stopButtonSet = new AnimatorSet();
+        collectionSet = new AnimatorSet();
+
+
+        if(!mDrawable.isPlay()){
+            alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 0, 1);
+            Log.e("PlayPauseView","StopButton if");
+
+        }else {
+            alphaAnimator = ObjectAnimator.ofFloat(stopButton,View.ALPHA,1,0);
+            Log.e("PlayPauseView","StopButton else");
+
+
+        }
+        alphaAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                if (mDrawable.isPlay()) {
+                    stopButton.setVisibility(VISIBLE);
+                    Log.e("PlayPauseView", "StopButton VISIBLE");
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        stopButtonSet.setDuration(200);
+        stopButtonSet.play(alphaAnimator);
+
+        final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
+        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+        mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+        mAnimatorSet.play(pausePlayAnim);
+        collectionSet.playSequentially(mAnimatorSet,stopButtonSet);
+        collectionSet.start();
+    }
+
+
+
+    public PlayPauseDrawable getPlayPauseDrawable() {
+        return mDrawable;
     }
 }

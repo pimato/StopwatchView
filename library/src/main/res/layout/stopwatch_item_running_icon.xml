@@ -8,7 +8,7 @@
     tools:context=".MainActivity"
     >
 
-    <TextView
+  <!--  <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/stopwatch_idle_default_textview"
@@ -19,21 +19,7 @@
         android:layout_marginStart="22dp"
         android:layout_centerVertical="true"
         android:textSize="@dimen/small_font_size"
-        />
-
-    <ImageButton
-        android:id="@+id/stopwatch_idle_stop_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:tint="@color/white"
-        android:layout_centerVertical="true"
-        android:clickable="true"
-        android:src="@drawable/ic_stop_24dp1"
-        android:cropToPadding="false"
-        android:layout_toStartOf="@+id/play_pause_view"
-        android:background="@drawable/circle_icon_background"
-        android:visibility="invisible"
-        />
+        />-->
 
     <pulbert.library.playdrawable.PlayPauseView
         android:id="@+id/play_pause_view"

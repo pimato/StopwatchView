@@ -16,7 +16,7 @@
 
     <dimen name="fab_compat_margin">0dp</dimen>
 
-    <dimen name="pause_bar_width">8dp</dimen>
-    <dimen name="pause_bar_distance">6dp</dimen>
-    <dimen name="pause_bar_height">24dp</dimen>
+    <dimen name="pause_bar_width">5dp</dimen>
+    <dimen name="pause_bar_distance">4dp</dimen>
+    <dimen name="pause_bar_height">16dp</dimen>
 </resources>

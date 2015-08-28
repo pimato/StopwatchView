@@ -45,7 +45,7 @@ public class PlayPauseDrawable extends Drawable {
     private float mHeight;
 
     private float mProgress;
-    private boolean mIsPlay;
+    private boolean mIsPlay =true;
 
     public PlayPauseDrawable(Context context) {
         final Resources res = context.getResources();
@@ -67,6 +67,10 @@ public class PlayPauseDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
+        /**
+         * Rewinds the path: clears any lines and curves from the path but
+         * keeps the internal data structure for faster reuse.
+         */
         mLeftPauseBar.rewind();
         mRightPauseBar.rewind();
 
@@ -104,8 +108,8 @@ public class PlayPauseDrawable extends Drawable {
 
         // (1) Pause --> Play: rotate 0 to 90 degrees clockwise.
         // (2) Play --> Pause: rotate 90 to 180 degrees clockwise.
-        final float rotationProgress = mIsPlay ? 1 - mProgress : mProgress;
-        final float startingRotation = mIsPlay ? 90 : 0;
+        final float rotationProgress = !mIsPlay ? 1 - mProgress : mProgress;
+        final float startingRotation = !mIsPlay ? 90 : 0;
         canvas.rotate(lerp(startingRotation, startingRotation + 90, rotationProgress), mWidth / 2f, mHeight / 2f);
 
         // Position the pause/play button in the center of the drawable's bounds.
@@ -119,7 +123,7 @@ public class PlayPauseDrawable extends Drawable {
     }
 
     public Animator getPausePlayAnimator() {
-        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, mIsPlay ? 1 : 0, mIsPlay ? 0 : 1);
+        final Animator anim = ObjectAnimator.ofFloat(this, PROGRESS, !mIsPlay ? 1 : 0, !mIsPlay ? 0 : 1);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -131,6 +135,10 @@ public class PlayPauseDrawable extends Drawable {
 
     public boolean isPlay() {
         return mIsPlay;
+    }
+
+    public void setIsPlay(boolean mIsPlay) {
+        this.mIsPlay = mIsPlay;
     }
 
     private void setProgress(float progress) {
