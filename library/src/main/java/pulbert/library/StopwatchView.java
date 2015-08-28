@@ -21,6 +21,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import pulbert.library.playdrawable.PlayPauseView;
+
 
 public class StopwatchView extends FrameLayout implements SharedPreferences.OnSharedPreferenceChangeListener  {
 
@@ -112,7 +114,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     private ButtonListener mSecondaryButtonListener;
     private ButtonListener mPrimaryButtonListener;
 
-
+    private PlayPauseView view;
 
     public StopwatchView(Context context) {
         this(context, null);
@@ -132,7 +134,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         inflate(getContext(), R.layout.stopwatch_item_main,this);
 
         mRunningLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_running_mainlayout);
-        mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_idle_mainlayout);
+        mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_idle_icon_mainlayout);
 
         if(mRunningLayout != null){
             setupRunningLayout();
@@ -147,22 +149,20 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
         mRunningSalaryTextView = (TextView) mRunningLayout.findViewById(R.id.stopwatch_running_salary_textview);
         mRunningTimeTextView = (TextView) mRunningLayout.findViewById(R.id.stopwatch_running_time_textview);
-        View divider = mRunningLayout.findViewById(R.id.stopwatch_running_divider);
-
         mSecondaryButton = (Button) this.findViewById(R.id.stopwatch_running_secondary_button);
-
 
         //get the Drawable from Start/pause button
         LayerDrawable mDrawableBG = (LayerDrawable) mSecondaryButton.getBackground();
         mSecondaryButtonDrawable = (GradientDrawable)  mDrawableBG.findDrawableByLayerId(R.id.button_drawable_shape);
         mButtonPauseColor = ContextCompat.getColor(getContext(),R.color.button_pause);
         mResumeColor = ContextCompat.getColor(getContext(), R.color.button_resume);
-
         mPrimaryButton = (Button) this.findViewById(R.id.stopwatch_running_primary_button);
         mPrimaryButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopStopwatch();
+                saveFinishTime();
+                doResetAndStop();
+                releaseWakeLock();
                 showIdleLayout();
                 mSecondaryButton.setText(v.getContext().getResources().getString(R.string.stopwatch_pause));
                 mSecondaryButtonDrawable.setColor(mButtonPauseColor);
@@ -177,32 +177,29 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                 onClickSecondaryButton(v);
             }
         });
-
-
-
     }
 
-    public void stopStopwatch(){
-        saveFinishTime();
-        doResetAndStop();
-        releaseWakeLock();
-    }
 
     public void setupIdleLayout(){
         String mIdleText = getContext().getResources().getString(R.string.default_textview_timer_content);
-        mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
-        mIdleTextView.setText(mIdleText);
+      //  mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
+      //      mIdleTextView.setText(mIdleText);
 
-        mStartButton = (Button) mIdleLayout.findViewById(R.id.stopwatch_idle_start_button);
+        view = (PlayPauseView) mIdleLayout.findViewById(R.id.play_pause_view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                view.toggle();
+            }
+        });
+
+     /*   mStartButton = (Button) mIdleLayout.findViewById(R.id.stopwatch_idle_start_button);
         mStartButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 startStopwatch();
             }
-        });
-
-
-
+        });*/
     }
 
     public void startStopwatch(){
@@ -211,30 +208,14 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         Intent intent = new Intent(context, StopwatchService.class);
         intent.putExtra(StopwatchView.MESSAGE_TIME, time);
         intent.putExtra(StopwatchView.SHOW_NOTIF, false);
-        start(time, intent, context);
-        showRunningLayout();
-
-    }
-
-    public void start(long time, Intent intent,Context context){
         doStart(time);
         intent.setAction(StopwatchView.START_STOPWATCH);
         context.startService(intent);
         saveDateTimeInformation();
         acquireWakeLock();
-    }
+        showRunningLayout();
 
-    public void setWage(float mSalary) {
-        this.mWage = mSalary;
     }
-
-    public void setPrimaryButtonListener(ButtonListener mCustomOnClickListener) {
-        this.mPrimaryButtonListener = mCustomOnClickListener;
-    }
-    public void setSecondaryButtonListener(ButtonListener mButtonListener){
-        this.mSecondaryButtonListener = mButtonListener;
-    }
-
 
 
     @Override
@@ -303,8 +284,6 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         Intent intent = new Intent(context, StopwatchService.class);
         intent.putExtra(StopwatchView.MESSAGE_TIME, time);
         intent.putExtra(StopwatchView.SHOW_NOTIF, false);
-
-
         switch(mState){
             //stop Time
             case StopwatchView.STOPWATCH_RUNNING:
@@ -329,16 +308,11 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                 context.startService(intent);
                 acquireWakeLock();
                 break;
-
         }
         if(mSecondaryButtonListener != null) {
             mSecondaryButtonListener.onClick(v,true);
         }
     }
-
-
-
-
 
     public void saveFinishTime(){
         Calendar c= Calendar.getInstance();
@@ -666,7 +640,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         editor.putLong (key + PREF_CTV_INTERVAL_START, mIntervalStartTime);
         editor.putLong (key + PREF_CTV_CURRENT_INTERVAL, mCurrentIntervalTime);
         editor.putLong (key + PREF_CTV_ACCUM_TIME, mAccumulatedTimeP);
-        editor.putLong (key + PREF_CTV_MARKER_TIME, mMarkerTime);
+        editor.putLong(key + PREF_CTV_MARKER_TIME, mMarkerTime);
         editor.apply();
     }
 
@@ -690,6 +664,17 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     }
     public int getFinishHour(){
         return fHour;
+    }
+
+    public void setWage(float mSalary) {
+        this.mWage = mSalary;
+    }
+
+    public void setPrimaryButtonListener(ButtonListener mCustomOnClickListener) {
+        this.mPrimaryButtonListener = mCustomOnClickListener;
+    }
+    public void setSecondaryButtonListener(ButtonListener mButtonListener){
+        this.mSecondaryButtonListener = mButtonListener;
     }
 
 

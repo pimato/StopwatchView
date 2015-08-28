@@ -12,5 +12,7 @@
 <color name="button_resume">#7acd2a</color>
 <color name="default_divider_color">#ebebeb</color>
 <color name="default_money_green">#43a047</color>
+<color name="purple">#6A1B9A</color>
+<color name="blue">#1565C0</color>
 
 </resources>

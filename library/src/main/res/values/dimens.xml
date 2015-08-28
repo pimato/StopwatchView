@@ -15,4 +15,8 @@
     <dimen name="notification_title_text_size">18dp</dimen>
 
     <dimen name="fab_compat_margin">0dp</dimen>
+
+    <dimen name="pause_bar_width">8dp</dimen>
+    <dimen name="pause_bar_distance">6dp</dimen>
+    <dimen name="pause_bar_height">24dp</dimen>
 </resources>

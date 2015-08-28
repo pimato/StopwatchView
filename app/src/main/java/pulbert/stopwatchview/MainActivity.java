@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import pulbert.library.ButtonListener;
 import pulbert.library.StopwatchService;
 import pulbert.library.StopwatchView;
 
@@ -19,13 +20,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mStopwatch =(StopwatchView) findViewById(R.id.stopwatch_view);
-        mStopwatch.setSecondaryButtonListener(new StopwatchView.ButtonListener() {
+        mStopwatch.setSecondaryButtonListener(new ButtonListener() {
             @Override
             public void onClick(View v, boolean checked) {
                 Toast.makeText(MainActivity.this,mStopwatch.getDateString(),Toast.LENGTH_SHORT).show();
             }
         });
-        mStopwatch.setPrimaryButtonListener(new StopwatchView.ButtonListener() {
+        mStopwatch.setPrimaryButtonListener(new ButtonListener() {
             @Override
             public void onClick(View v, boolean checked) {
                 if (checked) {
@@ -39,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
         mStopwatch.setWage(32.0f);
 
     }
-
-
 
     @Override
     protected void onPause() {
