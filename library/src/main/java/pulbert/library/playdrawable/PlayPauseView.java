@@ -100,41 +100,17 @@ public class PlayPauseView extends FrameLayout {
         mAnimatorSet.start();
     }*/
 
+    public void finishAnimation(final ImageView stopButton){
 
-
-    public void toggleAnimation(final ImageButton stopButton) {
-        if (collectionSet != null || mAnimatorSet != null || stopButtonSet != null) {
-            collectionSet.cancel();
-            mAnimatorSet.cancel();
-            stopButtonSet.cancel();
-        }
-
-        mAnimatorSet = new AnimatorSet();
-        stopButtonSet = new AnimatorSet();
-        collectionSet = new AnimatorSet();
-
-
-        if(!mDrawable.isPlay()){
-            alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 0, 1);
-            Log.e("PlayPauseView","StopButton if");
-
-        }else {
-            alphaAnimator = ObjectAnimator.ofFloat(stopButton,View.ALPHA,1,0);
-            Log.e("PlayPauseView","StopButton else");
-
-
-        }
+        alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 1, 0);
         alphaAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                if (mDrawable.isPlay()) {
-                    stopButton.setVisibility(VISIBLE);
-                    Log.e("PlayPauseView", "StopButton VISIBLE");
-                }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                stopButton.setVisibility(INVISIBLE);
             }
 
             @Override
@@ -154,8 +130,70 @@ public class PlayPauseView extends FrameLayout {
         mAnimatorSet.setInterpolator(new DecelerateInterpolator());
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
         mAnimatorSet.play(pausePlayAnim);
-        collectionSet.playSequentially(mAnimatorSet,stopButtonSet);
+        collectionSet.playSequentially(stopButtonSet,alphaAnimator);
         collectionSet.start();
+
+    }
+
+
+
+    public void toggleAnimation(final ImageButton stopButton) {
+        if (collectionSet != null || mAnimatorSet != null || stopButtonSet != null) {
+            collectionSet.cancel();
+            mAnimatorSet.cancel();
+            stopButtonSet.cancel();
+        }
+
+        mAnimatorSet = new AnimatorSet();
+        stopButtonSet = new AnimatorSet();
+        collectionSet = new AnimatorSet();
+
+
+        if(stopButton.getVisibility() == INVISIBLE) {
+            alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 0, 1);
+            alphaAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    if (mDrawable.isPlay()) {
+                        if(stopButton.getVisibility() == INVISIBLE){
+                            Log.e("PlayPauseView", "StopButton VISIBLE");
+                            stopButton.setVisibility(VISIBLE);
+                        }
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+            stopButtonSet.setDuration(200);
+            stopButtonSet.play(alphaAnimator);
+
+            final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
+            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+            mAnimatorSet.play(pausePlayAnim);
+            collectionSet.playSequentially(mAnimatorSet,stopButtonSet);
+            collectionSet.start();
+        }else {
+            final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
+            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+            mAnimatorSet.play(pausePlayAnim);
+            mAnimatorSet.start();
+        }
+
+
     }
 
 

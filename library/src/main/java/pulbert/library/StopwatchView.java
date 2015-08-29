@@ -118,6 +118,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     private PlayPauseView mPlayPauseButton;
     private ImageButton mStopButton;
+    private View divider;
 
     public StopwatchView(Context context) {
         this(context, null);
@@ -185,22 +186,51 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     public void setupIdleLayout(){
         String mIdleText = getContext().getResources().getString(R.string.default_textview_timer_content);
-      //  mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
-      //      mIdleTextView.setText(mIdleText);
+        mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
+        mRunningSalaryTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_running_salary_textview);
+        divider = mIdleLayout.findViewById(R.id.stopwatch_running_divider);
+        mIdleTextView.setText(mIdleText);
 
         mPlayPauseButton = (PlayPauseView) mIdleLayout.findViewById(R.id.play_pause_view);
         mStopButton = (ImageButton) mIdleLayout.findViewById(R.id.stopwatch_idle_stop_button);
+        mStopButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveFinishTime();
+                doResetAndStop();
+                releaseWakeLock();
+                mPlayPauseButton.finishAnimation(mStopButton);
+                setViewsVisibilty(false);
+                if(mPlayPauseButton.getPlayPauseDrawable().isPlay()){
+                    mPlayPauseButton.getPlayPauseDrawable().setIsPlay(false);
+                }
+            }
+        });
 
         mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mPlayPauseButton.getPlayPauseDrawable().isPlay()){
+                setViewsVisibilty(true);
+                long time = Utils.getTimeNow();
+                Context context = getContext().getApplicationContext();
+                Intent intent = new Intent(context, StopwatchService.class);
+                intent.putExtra(StopwatchView.MESSAGE_TIME, time);
+                intent.putExtra(StopwatchView.SHOW_NOTIF, false);
+                if (mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
                     Log.i("StopwatchView", "is Play Button");
+                    long curTime = Utils.getTimeNow();
+                    mAccumulatedTime += (curTime - mStartTime);
+                    doStop();
+                    intent.setAction(StopwatchView.STOP_STOPWATCH);
+                    context.startService(intent);
+                    releaseWakeLock();
                 } else {
                     Log.i("StopwatchView", "is Pause" + " Button");
-
+                    doStart(time);
+                    intent.setAction(StopwatchView.START_STOPWATCH);
+                    context.startService(intent);
+                    acquireWakeLock();
                 }
-
                 mPlayPauseButton.toggleAnimation(mStopButton);
 
             }
@@ -209,8 +239,20 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     }
 
+    public void setViewsVisibilty(boolean visible){
+        if(visible) {
+            divider.setVisibility(VISIBLE);
+            mRunningSalaryTextView.setVisibility(VISIBLE);
+        }else{
+            divider.setVisibility(INVISIBLE);
+            mRunningSalaryTextView.setVisibility(INVISIBLE);
+        }
 
-    public void startStopwatch(){
+    }
+
+
+
+ /*   public void startStopwatch(){
         long time = Utils.getTimeNow();
         Context context = getContext().getApplicationContext();
         Intent intent = new Intent(context, StopwatchService.class);
@@ -223,7 +265,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         acquireWakeLock();
         showRunningLayout();
 
-    }
+    }*/
 
 
     @Override
@@ -433,7 +475,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         Utils.clearSwSharedPref(prefs);
         clearSharedPref(prefs, "sw");
         mAccumulatedTime = 0;
-     //   mIdleTextView.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
+        mIdleTextView.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
         mState = StopwatchView.STOPWATCH_RESET;
 
     }
@@ -474,7 +516,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
             long curTime = Utils.getTimeNow();
             long totalTime = mAccumulatedTime + (curTime - mStartTime);
             updateTextViews(totalTime, false, true);
-
+            Log.i("StopwatchView", "Time" + totalTime);
             StopwatchView.this.postDelayed(mTimeUpdateThread, STOPWATCH_REFRESH_INTERVAL_MILLIS);
         }
     };
@@ -590,8 +632,8 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     }
 
     public void initTextViews(){
-        mRunningTimeTextView.setText(getTimeString());
-        mRunningSalaryTextView.setText(mCompleteSalary);
+          mIdleTextView.setText(getTimeString());
+          mRunningSalaryTextView.setText(mCompleteSalary);
 
     }
 
