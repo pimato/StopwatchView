@@ -7,7 +7,7 @@
 
     <include layout="@layout/stopwatch_item_idle_icon"/>
 
-    <include layout="@layout/stopwatch_item_running"/>
+  <!--  <include layout="@layout/stopwatch_item_running"/>-->
 
 
 </merge>

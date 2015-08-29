@@ -44,10 +44,10 @@ public class PlayPauseView extends FrameLayout {
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mDrawable = new PlayPauseDrawable(context);
-        AnimatorSet set = new AnimatorSet();
+      /*  AnimatorSet set = new AnimatorSet();
         Animator anim = mDrawable.getPausePlayAnimator();
         set.play(anim);
-        set.start();
+        set.start();*/
         mDrawable.setCallback(this);
 
     }
@@ -89,30 +89,24 @@ public class PlayPauseView extends FrameLayout {
         mDrawable.draw(canvas);
     }
 
- /*   public void toggle() {
-        if (mAnimatorSet != null) {
-            mAnimatorSet.cancel();
-        }
-
-        mAnimatorSet = new AnimatorSet();
-        final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
-        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
-        mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-        mAnimatorSet.play(pausePlayAnim);
-        mAnimatorSet.start();
-    }*/
 
     public void finishAnimation(final ImageView stopButton){
 
+        if (stopButtonSet != null) {
+            stopButtonSet.cancel();
+        }
         alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 1, 0);
+
         alphaAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
+
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 stopButton.setVisibility(INVISIBLE);
+
             }
 
             @Override
@@ -124,79 +118,60 @@ public class PlayPauseView extends FrameLayout {
             public void onAnimationRepeat(Animator animation) {
 
             }
+
         });
+        stopButtonSet = new AnimatorSet();
         stopButtonSet.setDuration(200);
         stopButtonSet.play(alphaAnimator);
+        stopButtonSet.start();
 
+    }
+
+    public void toggleStopButtonAnimation(final ImageButton stopButton){
+        if (stopButtonSet != null) {
+            stopButtonSet.cancel();
+        }
+        alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 0, 1);
+
+        alphaAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                    stopButton.setVisibility(VISIBLE);
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+
+        });
+        stopButtonSet = new AnimatorSet();
+        stopButtonSet.setDuration(200);
+        stopButtonSet.play(alphaAnimator);
+        stopButtonSet.start();
+
+    }
+
+    public void togglePlayPauseAnimation(){
+        if (mAnimatorSet != null) {
+            mAnimatorSet.cancel();
+        }
+        mAnimatorSet = new AnimatorSet();
         final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
         mAnimatorSet.setInterpolator(new DecelerateInterpolator());
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
         mAnimatorSet.play(pausePlayAnim);
-        collectionSet.playSequentially(stopButtonSet,alphaAnimator);
-        collectionSet.start();
-
-    }
-
-
-
-    public void toggleAnimation(final ImageButton stopButton) {
-        if (collectionSet != null || mAnimatorSet != null || stopButtonSet != null) {
-            collectionSet.cancel();
-            mAnimatorSet.cancel();
-            stopButtonSet.cancel();
-        }
-
-        mAnimatorSet = new AnimatorSet();
-        stopButtonSet = new AnimatorSet();
-        collectionSet = new AnimatorSet();
-
-
-
-        if(stopButton.getVisibility() == INVISIBLE) {
-            alphaAnimator = ObjectAnimator.ofFloat(stopButton, View.ALPHA, 0, 1);
-            alphaAnimator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    if (mDrawable.isPlay()) {
-                        if(stopButton.getVisibility() == INVISIBLE){
-                            Log.e("PlayPauseView", "StopButton VISIBLE");
-                            stopButton.setVisibility(VISIBLE);
-                        }
-                    }
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            });
-            stopButtonSet.setDuration(200);
-            stopButtonSet.play(alphaAnimator);
-
-            final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
-            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
-            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-            mAnimatorSet.play(pausePlayAnim);
-            collectionSet.playSequentially(mAnimatorSet,stopButtonSet);
-            collectionSet.start();
-        }else {
-            final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
-            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
-            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-            mAnimatorSet.play(pausePlayAnim);
-            mAnimatorSet.start();
-        }
-
-
+        mAnimatorSet.start();
     }
 
 

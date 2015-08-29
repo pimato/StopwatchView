@@ -14,6 +14,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.util.Property;
 
 import pulbert.library.R;
@@ -120,6 +121,7 @@ public class PlayPauseDrawable extends Drawable {
         canvas.drawPath(mRightPauseBar, mPaint);
 
         canvas.restore();
+        Log.e("PlayPauseDrawable",  "onDraw()");
     }
 
     public Animator getPausePlayAnimator() {

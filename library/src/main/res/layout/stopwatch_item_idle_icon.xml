@@ -21,29 +21,47 @@
         android:textSize="@dimen/small_font_size"
         />
 
-    <View
-        android:id="@+id/stopwatch_running_divider"
-        android:layout_height="20dp"
-        android:layout_width="1dp"
-        android:background="@color/default_divider_color"
-        android:layout_toEndOf="@id/stopwatch_idle_default_textview"
-        android:layout_centerVertical="true"
-        android:visibility="invisible"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        />
 
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/stopwatch_running_salary_textview"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white"
-        android:layout_toEndOf="@id/stopwatch_running_divider"
+        android:id="@+id/textviews_layout"
         android:layout_centerVertical="true"
-        android:visibility="invisible"
-        android:textSize="@dimen/small_font_size"
-        />
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stopwatch_running_textview"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="22dp"
+            android:textSize="@dimen/small_font_size"
+            />
+
+        <View
+            android:id="@+id/stopwatch_running_divider"
+            android:layout_height="20dp"
+            android:layout_width="1dp"
+            android:background="@color/default_divider_color"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/stopwatch_running_textview"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stopwatch_running_salary_textview"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@id/stopwatch_running_divider"
+            android:textSize="@dimen/small_font_size"
+            />
+    </RelativeLayout>
+
 
     <ImageButton
         android:id="@+id/stopwatch_idle_stop_button"
