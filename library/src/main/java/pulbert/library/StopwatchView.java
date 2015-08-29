@@ -185,7 +185,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
 
     public void setupIdleLayout(){
-        String mIdleText = getContext().getResources().getString(R.string.default_textview_timer_content);
+        final String mIdleText = getContext().getResources().getString(R.string.default_textview_timer_content);
         mIdleTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
         mRunningSalaryTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_running_salary_textview);
         divider = mIdleLayout.findViewById(R.id.stopwatch_running_divider);
@@ -210,7 +210,6 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setViewsVisibilty(true);
                 long time = Utils.getTimeNow();
                 Context context = getContext().getApplicationContext();
                 Intent intent = new Intent(context, StopwatchService.class);
@@ -231,6 +230,8 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                     context.startService(intent);
                     acquireWakeLock();
                 }
+                mIdleTextView.setText("0:00");
+                setViewsVisibilty(true);
                 mPlayPauseButton.toggleAnimation(mStopButton);
 
             }
