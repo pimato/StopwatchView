@@ -2,7 +2,6 @@ package pulbert.library.playdrawable;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -13,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.Property;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
@@ -21,15 +19,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import pulbert.library.StopwatchView;
-
 public class PlayPauseView extends FrameLayout {
 
 
     private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();
-    private AnimatorSet collectionSet;
     private AnimatorSet mAnimatorSet;
     private AnimatorSet stopButtonSet;
     private int mBackgroundColor;
@@ -44,10 +39,6 @@ public class PlayPauseView extends FrameLayout {
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mDrawable = new PlayPauseDrawable(context);
-      /*  AnimatorSet set = new AnimatorSet();
-        Animator anim = mDrawable.getPausePlayAnimator();
-        set.play(anim);
-        set.start();*/
         mDrawable.setCallback(this);
 
     }

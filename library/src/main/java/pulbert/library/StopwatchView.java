@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Parcelable;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -16,6 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -102,12 +105,8 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     private TextView mRunningSalaryTextView;
     private TextView mDefaultTextView;
 
-    private ButtonListener mSecondaryButtonListener;
-    private ButtonListener mPrimaryButtonListener;
-
     private PlayPauseView mPlayPauseButton;
     private ImageButton mStopButton;
-    private View divider;
 
     private RelativeLayout textViewsLayout;
 
@@ -128,28 +127,34 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         refcount++;
         inflate(getContext(), R.layout.stopwatch_item_main, this);
 
-        mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_idle_icon_mainlayout);
-
+        mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_mainlayout);
         if(mIdleLayout != null){
             setupIdleLayout();
         }
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Log.e(TAG,"onSaveInstanceState");
+        return super.onSaveInstanceState();
+    }
 
-
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        Log.e(TAG,"onRestoreInstanceState");
+        super.onRestoreInstanceState(state);
+    }
 
     public void setupIdleLayout(){
 
-        mRunningTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_running_textview);
-        mDefaultTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_idle_default_textview);
+        mRunningTextView = (TextView) findViewById(R.id.stopwatch_running_textview);
+        mDefaultTextView = (TextView) findViewById(R.id.stopwatch_default_textview);
 
-        mRunningSalaryTextView = (TextView) mIdleLayout.findViewById(R.id.stopwatch_running_salary_textview);
-        divider = mIdleLayout.findViewById(R.id.stopwatch_running_divider);
-
+        mRunningSalaryTextView = (TextView) findViewById(R.id.stopwatch_running_salary_textview);
         textViewsLayout = (RelativeLayout) findViewById(R.id.textviews_layout);
 
-        mPlayPauseButton = (PlayPauseView) mIdleLayout.findViewById(R.id.play_pause_view);
-        mStopButton = (ImageButton) mIdleLayout.findViewById(R.id.stopwatch_idle_stop_button);
+        mPlayPauseButton = (PlayPauseView) findViewById(R.id.play_pause_view);
+        mStopButton = (ImageButton) findViewById(R.id.stopwatch_stop_button);
         mStopButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,6 +205,18 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     }
 
 
+    public void changeButtonWithoutAnimation(){
+        Log.e(TAG, "isPlay :" + mPlayPauseButton.getPlayPauseDrawable().isPlay());
+        Log.e(TAG,"isPlay :"+ mPlayPauseButton.getPlayPauseDrawable().isPlay());
+        AnimatorSet set = new AnimatorSet();
+        Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+        anim.setDuration(1);
+        set.play(anim);
+        set.start();
+
+    }
+
+
 
 
 
@@ -239,6 +256,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
             if(mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
                 AnimatorSet set = new AnimatorSet();
                 Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+                anim.setDuration(1);
                 set.play(anim);
                 set.start();
             }
@@ -248,6 +266,7 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                 Log.e("Stopwatch", "setStartState()");
                 AnimatorSet set = new AnimatorSet();
                 Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+                anim.setDuration(1);
                 set.play(anim);
                 set.start();
             }
@@ -626,14 +645,6 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
     public void setWage(float mSalary) {
         this.mWage = mSalary;
     }
-
-    public void setPrimaryButtonListener(ButtonListener mCustomOnClickListener) {
-        this.mPrimaryButtonListener = mCustomOnClickListener;
-    }
-    public void setSecondaryButtonListener(ButtonListener mButtonListener){
-        this.mSecondaryButtonListener = mButtonListener;
-    }
-
 
     public void clearSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();
