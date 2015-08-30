@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -17,8 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -133,18 +130,6 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         }
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Log.e(TAG,"onSaveInstanceState");
-        return super.onSaveInstanceState();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        Log.e(TAG,"onRestoreInstanceState");
-        super.onRestoreInstanceState(state);
-    }
-
     public void setupIdleLayout(){
 
         mRunningTextView = (TextView) findViewById(R.id.stopwatch_running_textview);
@@ -203,23 +188,6 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         });
 
     }
-
-
-    public void changeButtonWithoutAnimation(){
-        Log.e(TAG, "isPlay :" + mPlayPauseButton.getPlayPauseDrawable().isPlay());
-        Log.e(TAG,"isPlay :"+ mPlayPauseButton.getPlayPauseDrawable().isPlay());
-        AnimatorSet set = new AnimatorSet();
-        Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
-        anim.setDuration(1);
-        set.play(anim);
-        set.start();
-
-    }
-
-
-
-
-
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {

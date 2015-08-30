@@ -23,10 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void changePlayPauseButton(View view){
-        mStopwatch.changeButtonWithoutAnimation();
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
