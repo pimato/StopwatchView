@@ -1,26 +1,32 @@
 package pulbert.library;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
+import android.os.Parcelable;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import pulbert.library.playdrawable.PlayPauseView;
 
-public class StopwatchView extends RelativeLayout implements SharedPreferences.OnSharedPreferenceChangeListener  {
+
+public class StopwatchView extends FrameLayout implements SharedPreferences.OnSharedPreferenceChangeListener  {
 
     private static final String TAG = "CountingTimerView";
 
@@ -31,22 +37,10 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     private static final String ONE_DIGIT = "%01d";
     private static final String NEG_TWO_DIGITS = "-%02d";
     private static final String NEG_ONE_DIGIT = "-%01d";
-    private String mHours, mMinutes, mSeconds;
-    private String mCompleteSalary;
-    private TextView mTimerCounter;
-    private TextView mSalaryCounter;
-    private Button rightButton;
-    private Button leftButton;
-    private GradientDrawable mShape,mShapeV;
-    private int mButtonStartColor;
-    private int mButtonStopColor;
-    private int mButtonPauseColor;
-    private int mResumeColor;
     int mState = StopwatchView.STOPWATCH_RESET;
     long mAccumulatedTime = 0;
     long mStartTime = 0;
     private PowerManager.WakeLock mWakeLock;
-    private View divider;
 
     private long mIntervalTime = 0;
     private long mIntervalStartTime = -1;
@@ -85,17 +79,12 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static final int STOPWATCH_RUNNING = 1;
     public static final int STOPWATCH_STOPPED = 2;
 
-    //custom added
     public static final String PREF_YEAR = "sw_year";
     public static final String PREF_MONTH = "sw_month";
     public static final String PREF_DAY = "sw_day";
 
     public static final String PREF_START_MINUTE = "sw_start_minute";
     public static final String PREF_START_HOUR = "sw_start_hour";
-
-  //  public static final String PREF_FINISH_MINUTE = "sw_finish_minute";
-  //  public static final String PREF_FINISH_HOUR = "sw_finish_hour";
-
 
     private int mYear,mMonth,mDay;
     private int sHour,sMinute;
@@ -105,14 +94,27 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     public static int refcount = 0;
     public float mWage;
 
-    private ButtonListener mPrimaryButtonListener,mSecondaryButtonListener;
 
+    private RelativeLayout mIdleLayout;
+
+    private String mHours;
+    private String mMinutes;
+    private String mSeconds;
+    private String mCompleteSalary;
+    private TextView mRunningTextView;
+    private TextView mRunningSalaryTextView;
+    private TextView mDefaultTextView;
+
+    private PlayPauseView mPlayPauseButton;
+    private ImageButton mStopButton;
+
+    private RelativeLayout textViewsLayout;
 
     public StopwatchView(Context context) {
         this(context, null);
     }
     public StopwatchView(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
 
     }
     public StopwatchView(Context context, AttributeSet attrs, int defStyle) {
@@ -123,73 +125,104 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     public void init(){
         refcount++;
-        inflate(getContext(), R.layout.stopwatch_item,this);
-        Resources r = getContext().getResources();
+        inflate(getContext(), R.layout.stopwatch_item_main, this);
 
-        mTimerCounter = (TextView) this.findViewById(R.id.timer_counter_textview);
-        mSalaryCounter = (TextView) this.findViewById(R.id.salary_counter_textview);
-        divider = this.findViewById(R.id.divider_id);
+        mIdleLayout = (RelativeLayout) this.findViewById(R.id.stopwatch_mainlayout);
+        if(mIdleLayout != null){
+            setupIdleLayout();
+        }
+    }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Log.e(TAG,"onSaveInstanceState");
+        return super.onSaveInstanceState();
+    }
 
-        rightButton = (Button) this.findViewById(R.id.button_stopwatch);
-        leftButton = (Button) this.findViewById(R.id.button_stop);
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        Log.e(TAG,"onRestoreInstanceState");
+        super.onRestoreInstanceState(state);
+    }
 
-        //get the Drawable from STOP button
-        LayerDrawable mStopDrawable = (LayerDrawable) leftButton.getBackground();
-        mShapeV = (GradientDrawable)  mStopDrawable.findDrawableByLayerId(R.id.button_drawable_shape);
-        mShapeV.setColor(r.getColor(R.color.button_pause));
+    public void setupIdleLayout(){
 
-        //get the Drawable from Start/pause button
-        LayerDrawable mDrawableBG = (LayerDrawable) rightButton.getBackground();
-        mShape = (GradientDrawable)  mDrawableBG.findDrawableByLayerId(R.id.button_drawable_shape);
+        mRunningTextView = (TextView) findViewById(R.id.stopwatch_running_textview);
+        mDefaultTextView = (TextView) findViewById(R.id.stopwatch_default_textview);
 
-        mButtonStartColor = r.getColor(R.color.button_start);
-        mButtonStopColor = r.getColor(R.color.button_stop);
-        mButtonPauseColor = r.getColor(R.color.button_pause);
-        mResumeColor = r.getColor(R.color.button_resume);
-        mShape.setColor(mButtonStartColor);
-        rightButton.setOnClickListener(new OnClickListener() {
+        mRunningSalaryTextView = (TextView) findViewById(R.id.stopwatch_running_salary_textview);
+        textViewsLayout = (RelativeLayout) findViewById(R.id.textviews_layout);
+
+        mPlayPauseButton = (PlayPauseView) findViewById(R.id.play_pause_view);
+        mStopButton = (ImageButton) findViewById(R.id.stopwatch_stop_button);
+        mStopButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                rightButtonAction(v);
+                saveFinishTime();
+                doResetAndStop();
+                releaseWakeLock();
+                mPlayPauseButton.finishAnimation(mStopButton);
+                if (mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
+                    mPlayPauseButton.togglePlayPauseAnimation();
+                }
+                textViewsLayout.setVisibility(View.GONE);
+                mDefaultTextView.setVisibility(VISIBLE);
+
             }
         });
-        leftButton.setOnClickListener(new OnClickListener() {
+
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                leftButtonAction(v);
+                if (mStopButton.getVisibility() == INVISIBLE) {
+                    mPlayPauseButton.toggleStopButtonAnimation(mStopButton);
+                }
+                mPlayPauseButton.togglePlayPauseAnimation();
+                long time = Utils.getTimeNow();
+                Context context = getContext().getApplicationContext();
+                Intent intent = new Intent(context, StopwatchService.class);
+                intent.putExtra(StopwatchView.MESSAGE_TIME, time);
+                intent.putExtra(StopwatchView.SHOW_NOTIF, false);
+                if (mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
+                    long curTime = Utils.getTimeNow();
+                    mAccumulatedTime += (curTime - mStartTime);
+                    doStop();
+                    intent.setAction(StopwatchView.STOP_STOPWATCH);
+                    context.startService(intent);
+                    releaseWakeLock();
+                } else {
+                    doStart(time);
+                    intent.setAction(StopwatchView.START_STOPWATCH);
+                    context.startService(intent);
+                    acquireWakeLock();
+                }
+                mDefaultTextView.setVisibility(View.GONE);
+                textViewsLayout.setVisibility(VISIBLE);
+
             }
         });
 
     }
 
-    public void setWage(float mSalary) {
-        this.mWage = mSalary;
+
+    public void changeButtonWithoutAnimation(){
+        Log.e(TAG, "isPlay :" + mPlayPauseButton.getPlayPauseDrawable().isPlay());
+        Log.e(TAG,"isPlay :"+ mPlayPauseButton.getPlayPauseDrawable().isPlay());
+        AnimatorSet set = new AnimatorSet();
+        Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+        anim.setDuration(1);
+        set.play(anim);
+        set.start();
+
     }
 
-    public interface ButtonListener {
-        void onClick(View v, boolean checked);
-    }
-    public void setPrimaryButtonListener(ButtonListener mCustomOnClickListener) {
-        this.mPrimaryButtonListener = mCustomOnClickListener;
-    }
-    public void setSecondaryButtonListener(ButtonListener mButtonListener){
-        this.mSecondaryButtonListener = mButtonListener;
-    }
+
+
 
 
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-     /*   if (prefs.equals(PreferenceManager.getDefaultSharedPreferences(getContext()))) {
-            if (! (key.equals(StopwatchView.PREF_LAP_NUM) ||
-                    key.startsWith(StopwatchView.PREF_LAP_TIME))) {
-                this.readFromSharedPref(prefs);
-                if (prefs.getBoolean(StopwatchView.PREF_UPDATE_CIRCLE, true)) {
-                    this.readFromSharedPref(prefs, "sw");
-                }
-            }
-        }*/
     }
 
     public void onResume(Context context){
@@ -209,17 +242,39 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         this.reDraw();
 
         if (mState == StopwatchView.STOPWATCH_RUNNING) {
-            this.setRunningState();
-            Log.e("Stopwatch", "setRunningState()");
+            acquireWakeLock();
+            startUpdateThread();
+            mDefaultTextView.setVisibility(View.GONE);
+            textViewsLayout.setVisibility(VISIBLE);
+            mStopButton.setVisibility(VISIBLE);
+            Log.e("Stopwatch", "recoverRunningState()");
         } else if (mState == StopwatchView.STOPWATCH_STOPPED && mAccumulatedTime != 0) {
-            this.setResumeState();
-            Log.e("Stopwatch", "setResumeState()");
+            mDefaultTextView.setVisibility(View.GONE);
+            textViewsLayout.setVisibility(VISIBLE);
+            mStopButton.setVisibility(VISIBLE);
+
+            if(mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
+                AnimatorSet set = new AnimatorSet();
+                Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+                anim.setDuration(1);
+                set.play(anim);
+                set.start();
+            }
+            Log.e("Stopwatch", "recoverResumeState()");
         } else {
-            this.setStartState();
-            Log.e("Stopwatch", "setStartState()");
+            if(mPlayPauseButton.getPlayPauseDrawable().isPlay()) {
+                Log.e("Stopwatch", "setStartState()");
+                AnimatorSet set = new AnimatorSet();
+                Animator anim = mPlayPauseButton.getPlayPauseDrawable().getPausePlayAnimator();
+                anim.setDuration(1);
+                set.play(anim);
+                set.start();
+            }
         }
 
     }
+
+
     public void onPause(Context context){
 
         Intent intent = new Intent(context, StopwatchService.class);
@@ -228,7 +283,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
         if (mState == StopwatchView.STOPWATCH_RUNNING) {
             this.stopUpdateThread();
-
             // This is called because the lock screen was activated, the window stay
             // active under it and when we unlock the screen, we see the old time for
             // a fraction of a second.
@@ -243,90 +297,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         releaseWakeLock();
     }
 
-    public void leftButtonAction(View v){
-        long time = Utils.getTimeNow();
-        Context context = getContext().getApplicationContext();
-        Intent intent = new Intent(context, StopwatchService.class);
-        intent.putExtra(StopwatchView.MESSAGE_TIME, time);
-        intent.putExtra(StopwatchView.SHOW_NOTIF, false);
 
-        switch(mState){
-            //stop Time
-            case StopwatchView.STOPWATCH_RUNNING:
-                mShapeV.setColor(mResumeColor);
-                leftButton.setText(getContext().getResources().getString(R.string.stopwatch_resume));
-                //save actual Color
-                long curTime = Utils.getTimeNow();
-                mAccumulatedTime += (curTime - mStartTime);
-                doStop();
-                intent.setAction(StopwatchView.STOP_STOPWATCH);
-                context.startService(intent);
-                releaseWakeLock();
-                if(mSecondaryButtonListener != null) {
-                    mSecondaryButtonListener.onClick(v,true);
-                }
-                break;
-
-            //pause Time
-            case StopwatchView.STOPWATCH_STOPPED:
-                mShapeV.setColor(mButtonPauseColor);
-                leftButton.setText(getContext().getResources().getString(R.string.stopwatch_pause));
-                doStart(time);
-                intent.setAction(StopwatchView.START_STOPWATCH);
-                context.startService(intent);
-                acquireWakeLock();
-                if(mSecondaryButtonListener != null) {
-                    mSecondaryButtonListener.onClick(v,true);
-                }
-                break;
-
-        }
-    }
-    public void rightButtonAction(View v){
-        long time = Utils.getTimeNow();
-        Context context = getContext().getApplicationContext();
-        Intent intent = new Intent(context, StopwatchService.class);
-        intent.putExtra(StopwatchView.MESSAGE_TIME, time);
-        intent.putExtra(StopwatchView.SHOW_NOTIF, false);
-
-        switch (mState){
-            case StopwatchView.STOPWATCH_RESET:
-                // do start
-
-
-                doStart(time);
-                intent.setAction(StopwatchView.START_STOPWATCH);
-                context.startService(intent);
-                saveDateTimeInformation();
-                acquireWakeLock();
-                rightButton.setText(context.getResources().getString(R.string.stopwatch_stop));
-                mShape.setColor(mButtonStopColor);
-                setViewsVisible(true);
-                if(mPrimaryButtonListener != null) {
-                    mPrimaryButtonListener.onClick(v,true);
-                }
-                // Invoke the other added onclick listener
-                break;
-            default:
-                saveFinishTime();
-                doResetAndStop();
-                setViewsVisible(false);
-                mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
-                mShapeV.setColor(mButtonPauseColor);
-                leftButton.setText(getContext().getResources().getString(R.string.stopwatch_pause));
-                rightButton.setText(context.getResources().getString(R.string.stopwatch_start));
-                mShape.setColor(mButtonStartColor);
-                if(mPrimaryButtonListener != null) {
-                    mPrimaryButtonListener.onClick(v,false);
-                }
-                releaseWakeLock();
-                break;
-
-
-        }
-
-
-    }
 
     public void saveFinishTime(){
         Calendar c= Calendar.getInstance();
@@ -343,21 +314,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         sHour = c.get(Calendar.HOUR_OF_DAY);
     }
 
-
-
-    private void setViewsVisible(boolean visible){
-        if(visible) {
-            divider.setVisibility(VISIBLE);
-            mTimerCounter.setVisibility(VISIBLE);
-            leftButton.setVisibility(VISIBLE);
-            mSalaryCounter.setVisibility(VISIBLE);
-        }else{
-            divider.setVisibility(INVISIBLE);
-            mSalaryCounter.setVisibility(INVISIBLE);
-            mTimerCounter.setVisibility(VISIBLE);
-            leftButton.setVisibility(INVISIBLE);
-        }
-    }
 
     private void doReset() {
         //   if (DEBUG) LogUtils.v("StopwatchFragment.doReset");
@@ -381,8 +337,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         editor.putInt(StopwatchView.PREF_MONTH,mMonth);
         editor.putInt(StopwatchView.PREF_DAY,mDay);
 
-        editor.putLong (StopwatchView.PREF_START_TIME, mStartTime);
-        editor.putLong (StopwatchView.PREF_ACCUM_TIME, mAccumulatedTime);
+        editor.putLong(StopwatchView.PREF_START_TIME, mStartTime);
+        editor.putLong(StopwatchView.PREF_ACCUM_TIME, mAccumulatedTime);
         editor.putInt (StopwatchView.PREF_STATE, mState);
 
         if (mState == StopwatchView.STOPWATCH_RUNNING) {
@@ -435,32 +391,6 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         updateTextViews(mAccumulatedTime, false, true);
     }
 
-    public void setRunningState(){
-        acquireWakeLock();
-        startUpdateThread();
-        mShapeV.setColor(mButtonPauseColor);
-        leftButton.setText(getContext().getResources().getString(R.string.stopwatch_pause));
-        mShape.setColor(mButtonStopColor);
-        rightButton.setText(getContext().getResources().getString(R.string.stopwatch_stop));
-        leftButton.setVisibility(VISIBLE);
-        mSalaryCounter.setVisibility(VISIBLE);
-    }
-
-    public void setResumeState(){
-        mShape.setColor(mButtonStopColor);
-        mShapeV.setColor(mResumeColor);
-        leftButton.setText(getContext().getResources().getString(R.string.stopwatch_resume));
-        leftButton.setVisibility(VISIBLE);
-        mSalaryCounter.setVisibility(VISIBLE);
-        rightButton.setText(getContext().getResources().getString(R.string.stopwatch_stop));
-
-    }
-
-    public void setStartState(){
-        mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
-        mShape.setColor(mButtonStartColor);
-
-    }
 
     public void doResetAndStop(){
         stopUpdateThread();
@@ -470,7 +400,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         Utils.clearSwSharedPref(prefs);
         clearSharedPref(prefs, "sw");
         mAccumulatedTime = 0;
-        mTimerCounter.setText(getContext().getResources().getString(R.string.default_textview_timer_content));
+        mRunningTextView.setText("0:00");
+        mRunningSalaryTextView.setText("0,00 €");
         mState = StopwatchView.STOPWATCH_RESET;
 
     }
@@ -511,7 +442,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
             long curTime = Utils.getTimeNow();
             long totalTime = mAccumulatedTime + (curTime - mStartTime);
             updateTextViews(totalTime, false, true);
-
+            Log.i("StopwatchView", "Time" + totalTime);
             StopwatchView.this.postDelayed(mTimeUpdateThread, STOPWATCH_REFRESH_INTERVAL_MILLIS);
         }
     };
@@ -523,12 +454,12 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
 
     /**
      * Update the time to display. Separates that time into the hours, minutes, seconds and
-     * hundredths. If update is true, the view is invalidated so that it will draw again.
+     * hundredths. If update is true, the mPlayPauseButton is invalidated so that it will draw again.
      *
      * @param time new time to display - in milliseconds
      * @param showHundredths flag to show hundredths resolution
-     * @param update to invalidate the view - otherwise the time is examined to see if it is within
-     *               100 milliseconds of zero seconds and when so, invalidate the view.
+     * @param update to invalidate the mPlayPauseButton - otherwise the time is examined to see if it is within
+     *               100 milliseconds of zero seconds and when so, invalidate the mPlayPauseButton.
      */
     // TODO:showHundredths S/B attribute or setter - i.e. unchanging over object life
     public void updateTextViews(long time, boolean showHundredths, boolean update) {
@@ -627,8 +558,8 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
     }
 
     public void initTextViews(){
-        mTimerCounter.setText(getTimeString());
-        mSalaryCounter.setText(mCompleteSalary);
+          mRunningTextView.setText(getTimeString());
+          mRunningSalaryTextView.setText(mCompleteSalary);
 
     }
 
@@ -677,7 +608,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         return s.toString();
     }
 
-    // Since this view is used in multiple places, use the key to save different instances
+    // Since this mPlayPauseButton is used in multiple places, use the key to save different instances
     public void writeToSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean (key + PREF_CTV_PAUSED, mPaused);
@@ -685,7 +616,7 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         editor.putLong (key + PREF_CTV_INTERVAL_START, mIntervalStartTime);
         editor.putLong (key + PREF_CTV_CURRENT_INTERVAL, mCurrentIntervalTime);
         editor.putLong (key + PREF_CTV_ACCUM_TIME, mAccumulatedTimeP);
-        editor.putLong (key + PREF_CTV_MARKER_TIME, mMarkerTime);
+        editor.putLong(key + PREF_CTV_MARKER_TIME, mMarkerTime);
         editor.apply();
     }
 
@@ -711,6 +642,9 @@ public class StopwatchView extends RelativeLayout implements SharedPreferences.O
         return fHour;
     }
 
+    public void setWage(float mSalary) {
+        this.mWage = mSalary;
+    }
 
     public void clearSharedPref(SharedPreferences prefs, String key) {
         SharedPreferences.Editor editor = prefs.edit();

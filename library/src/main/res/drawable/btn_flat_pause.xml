@@ -2,8 +2,8 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="?attr/colorControlHighlight">
     <item android:id="@+id/button_drawable_shape">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android">
-            <corners android:radius="2dp" />
+    <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <corners android:radius="1dp" />
             <solid android:color="@color/button_pause" />
         </shape>
     </item>

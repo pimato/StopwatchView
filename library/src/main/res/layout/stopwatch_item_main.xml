@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+
+    >
+
+    <RelativeLayout
+        android:id="@+id/stopwatch_mainlayout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/button_start"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stopwatch_default_textview"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:layout_alignParentStart="true"
+            android:text="@string/default_textview_timer_content"
+            android:layout_marginStart="16dp"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/small_font_size"
+            />
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviews_layout"
+            android:layout_centerVertical="true"
+            android:visibility="invisible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stopwatch_running_textview"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
+                android:textSize="@dimen/small_font_size"
+                />
+
+            <View
+                android:id="@+id/stopwatch_running_divider"
+                android:layout_height="20dp"
+                android:layout_width="1dp"
+                android:background="@color/default_divider_color"
+                android:layout_centerInParent="true"
+                android:layout_toEndOf="@id/stopwatch_running_textview"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stopwatch_running_salary_textview"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white"
+                android:layout_toEndOf="@id/stopwatch_running_divider"
+                android:textSize="@dimen/small_font_size"
+                />
+        </RelativeLayout>
+
+
+        <ImageButton
+            android:id="@+id/stopwatch_stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/white"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:src="@drawable/ic_stop_24dp1"
+            android:cropToPadding="false"
+            android:layout_toStartOf="@+id/play_pause_view"
+            android:background="@drawable/circle_icon_background"
+            android:visibility="invisible"
+            />
+
+        <pulbert.library.playdrawable.PlayPauseView
+            android:id="@+id/play_pause_view"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:clickable="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:foreground="?android:selectableItemBackground"
+            />
+
+
+    </RelativeLayout>
+
+
+
+</merge>
