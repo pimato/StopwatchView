@@ -8,9 +8,10 @@
     <pulbert.library.StopwatchView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/stopwatch_view"
+        android:background="@color/button_start"
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_height="match_parent"
+        android:layout_height="56dp"
         />
 
 </RelativeLayout>

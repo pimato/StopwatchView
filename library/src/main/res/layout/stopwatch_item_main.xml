@@ -12,7 +12,6 @@
         android:id="@+id/stopwatch_mainlayout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/button_start"
         >
 
         <TextView
@@ -91,7 +90,7 @@
             android:clickable="true"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:foreground="?android:selectableItemBackground"
             />
 

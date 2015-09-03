@@ -107,6 +107,9 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
 
     private RelativeLayout textViewsLayout;
 
+    private ButtonListener mSecondaryButtonListener;
+    private ButtonListener mPrimaryButtonListener;
+
     public StopwatchView(Context context) {
         this(context, null);
     }
@@ -153,6 +156,10 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                 textViewsLayout.setVisibility(View.GONE);
                 mDefaultTextView.setVisibility(VISIBLE);
 
+                if(mSecondaryButtonListener != null) {
+                    mSecondaryButtonListener.onClick(v, true);
+                }
+
             }
         });
 
@@ -183,6 +190,9 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
                 }
                 mDefaultTextView.setVisibility(View.GONE);
                 textViewsLayout.setVisibility(VISIBLE);
+                if(mPrimaryButtonListener != null) {
+                    mPrimaryButtonListener.onClick(v,true);
+                }
 
             }
         });
@@ -627,6 +637,13 @@ public class StopwatchView extends FrameLayout implements SharedPreferences.OnSh
         editor.remove (key + PREF_CTV_MARKER_TIME);
         editor.remove (key + PREF_CTV_TIMER_MODE);
         editor.apply();
+    }
+
+    public void setPrimaryButtonListener(ButtonListener mCustomOnClickListener) {
+        this.mPrimaryButtonListener = mCustomOnClickListener;
+    }
+    public void setSecondaryButtonListener(ButtonListener mButtonListener){
+        this.mSecondaryButtonListener = mButtonListener;
     }
 }
 
